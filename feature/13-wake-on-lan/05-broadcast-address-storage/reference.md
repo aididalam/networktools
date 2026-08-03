@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Wake-on-LAN screen uses broadcast address storage as part of a saved device profile or packet destination. Values are validated, stored in app-private local storage when applicable, and remain editable before a packet is sent.
+The editor detects the exact IPv4 broadcast address from the active Wi-Fi/Ethernet prefix and lets the user explicitly retain or edit it. Local sending is blocked unless the stored private broadcast exactly matches the currently active subnet, preventing stale or public broadcast destinations.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Wake-on-LAN screen uses broadcast address storage as part of a saved device 
 ### 5. Security Testing
 
 - [ ] Verify Broadcast Address Storage validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify the stored address is excluded from backup/device transfer, logs, and analytics, and that socket broadcast is enabled only for a validated local profile whose destination exactly matches the active network.
 
 - [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 

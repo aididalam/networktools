@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-Remote Wake-on-LAN sends a magic packet to a user-configured public host or relay and UDP port after explaining that router forwarding or a compatible relay is required. Remote destinations are explicit, validated, and never inferred from approximate device-location data.
+Remote Wake-on-LAN sends one magic packet directly to an explicitly configured public unicast host/IP and UDP port after explaining that the user's router forwarding or own compatible relay is required. The app provides no relay, infers no endpoint, rejects local/special-use DNS results, performs no retry, and never runs remotely or in the background.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ Remote Wake-on-LAN sends a magic packet to a user-configured public host or rela
 ### 5. Security Testing
 
 - [ ] Verify Remote Wake-on-LAN Support validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify only standard DNS and the confirmed UDP destination are contacted, at most eight DNS answers are considered, and no app-operated relay, HTTP API, API key, paid provider, location inference, analytics, log, scheduler, or background service exists.
 
 - [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 

@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Router Setup screen uses manual router address entry to establish the router destination for later administration actions. Automatically detected and manually supplied values remain distinguishable and are validated before use.
+Manual mode accepts one bounded numeric private, carrier-grade NAT, or link-local IPv4/IPv6 router address. It rejects public, loopback, unspecified, malformed, URL, path, port, query, fragment, whitespace, and credential input; scoped link-local IPv6 is normalized and its zone is safely URI-encoded.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Router Setup screen uses manual router address entry to establish the router
 ### 5. Security Testing
 
 - [ ] Verify Manual Router Address Entry validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify the input is validated without DNS resolution or network traffic and is never persisted, logged, sent to analytics, added to backups, or reused after an unconfirmed action.
 
 - [ ] Inspect intents, WebView usage, logs, storage, and network traffic; verify no credentials, default-password attempts, JavaScript bridge, automatic setting change, or unconfirmed navigation occurs.
 

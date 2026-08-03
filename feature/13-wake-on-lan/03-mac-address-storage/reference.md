@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Wake-on-LAN screen uses MAC address storage as part of a saved device profile or packet destination. Values are validated, stored in app-private local storage when applicable, and remain editable before a packet is sent.
+MAC input accepts colon, hyphen, or compact hexadecimal form and normalizes it to uppercase colon notation. Placeholder, multicast, malformed, and oversized values are rejected; the validated six bytes are stored app-privately and used only to build a confirmed magic packet.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Wake-on-LAN screen uses MAC address storage as part of a saved device profil
 ### 5. Security Testing
 
 - [ ] Verify MAC Address Storage validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify MAC values are excluded from backup/device transfer, logs, analytics, crash messages, and unrelated traffic; the only transmission is 16 repetitions inside the explicitly confirmed standard packet.
 
 - [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 

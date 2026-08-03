@@ -7,8 +7,8 @@ The IP Finder requests the device's internet-facing IPv4 or IPv6 address from a 
 ## Google Play Policy Requirements
 
 - Use only keyless public-IP echo, standard DNS, IANA bootstrap, and authoritative RDAP/DNS-to-ASN lookups; do not add paid/keyed enrichment or hidden location/privacy profiling.
-- Run lookups only after an explicit user action, apply conservative rate limits, and do not provide bulk IP or domain enumeration. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
-- Do not store or send targets and results to analytics, advertising, or unrelated services; disclose the minimum keyless endpoint processing in the privacy policy. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+- Run one lookup only after an explicit user action; bound DNS questions to three, resolved addresses to 16, origin ASNs to four, HTTPS bodies to 1 MiB, and timeouts to 1-5 seconds; do not provide bulk IP or domain enumeration. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Do not store or send targets and results to analytics, advertising, or unrelated services; disclose the minimum keyless endpoint processing in the privacy policy. Country, region, city, coordinates, timezone, VPN, proxy, and hosting classification remain excluded. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
 
 ## Test Cases
 
@@ -31,13 +31,13 @@ The IP Finder requests the device's internet-facing IPv4 or IPv6 address from a 
 
 ### 4. Performance Testing
 
-- [ ] Measure Public IP Lookup with small, typical, and maximum supported workloads; verify progress remains responsive and completion respects the configured timeout or product performance budget.
+- [ ] Measure Public IP Lookup with zero, one, and 16 DNS addresses plus maximum-size bounded RDAP fixtures; verify progress remains responsive and each stage respects its configured timeout.
 - [ ] Repeat the workflow at least 20 times and monitor memory, CPU, battery, sockets, and coroutine or callback counts; verify resources return to baseline after completion or cancellation.
 
 ### 5. Security Testing
 
 - [ ] Verify Public IP Lookup validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify HTTPS is required for IP echo, IANA bootstrap, and RDAP; direct DNS traffic goes only to the displayed resolver, local-network permission is requested only where Android requires it, and no inputs or results enter storage, logs, analytics, backups, or crash messages.
 
 - [ ] Capture all network calls and inspect configuration; verify only documented keyless DNS, IANA, RDAP, ASN, and public-IP endpoints are contacted and no secret or runtime API key exists.
 

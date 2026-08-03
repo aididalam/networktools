@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-Local-network Wake-on-LAN sends the selected device's magic packet through the active Wi-Fi or Ethernet interface to the configured subnet broadcast address. The app validates that the destination is suitable for local delivery and reports when no usable local route exists.
+Local Wake-on-LAN derives the private IPv4 subnet and broadcast from Android `LinkProperties`, verifies both saved device and broadcast against that active Wi-Fi/Ethernet network, binds one UDP socket to the active network, and sends only after exact confirmation. Android 16 local-network permission is requested only when required for that send.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ Local-network Wake-on-LAN sends the selected device's magic packet through the a
 ### 5. Security Testing
 
 - [ ] Verify Local Network Wake-on-LAN validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify permission is requested only on applicable Android versions at send time, the socket is bound to the active local network and closed immediately, and no discovery probe, internet API, log, analytics event, or background send occurs.
 
 - [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 

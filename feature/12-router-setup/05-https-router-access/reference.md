@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Router Setup screen uses HTTPS router access to open the detected or manually validated router address through the appropriate Android intent. The destination is shown before launch and unsupported, unsafe, or unreachable destinations are handled without a crash.
+HTTPS is selected by default. The screen displays the exact normalized `https://` base URL and requires confirmation before handing it to an external browser, whose normal certificate and authentication handling remains in control.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Router Setup screen uses HTTPS router access to open the detected or manuall
 ### 5. Security Testing
 
 - [ ] Verify HTTPS Router Access validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify HTTPS remains the default, the app does not disable browser certificate validation or silently fall back to HTTP, and no router address, credential, cookie, page, or configuration is stored.
 
 - [ ] Inspect intents, WebView usage, logs, storage, and network traffic; verify no credentials, default-password attempts, JavaScript bridge, automatic setting change, or unconfirmed navigation occurs.
 

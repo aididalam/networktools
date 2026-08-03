@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Wake-on-LAN screen uses friendly device names as part of a saved device profile or packet destination. Values are validated, stored in app-private local storage when applicable, and remain editable before a packet is sent.
+Every profile requires a trimmed friendly name of 1-48 non-control characters. Names identify saved cards and confirmation/result states only; they are not placed in the binary magic packet, sent to DNS, or uploaded.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Wake-on-LAN screen uses friendly device names as part of a saved device prof
 ### 5. Security Testing
 
 - [ ] Verify Friendly Device Names validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify friendly names remain app-private, are excluded from backup/device transfer, are absent from packet bytes and DNS questions, and are not logged or sent to analytics or remote services.
 
 - [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 

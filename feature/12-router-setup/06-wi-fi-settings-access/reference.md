@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Router Setup screen uses Wi-Fi settings access to open the detected or manually validated router address through the appropriate Android intent. The destination is shown before launch and unsupported, unsafe, or unreachable destinations are handled without a crash.
+The Wi-Fi settings action opens Android's Wi-Fi panel on Android 10 and later, with the platform Wi-Fi settings screen as the older-version fallback. Android owns all viewing and changes; the app receives no password, network configuration, or settings result.
 
 ## Google Play Policy Requirements
 
@@ -22,7 +22,7 @@ The Router Setup screen uses Wi-Fi settings access to open the detected or manua
 - [ ] Invoke Wi-Fi Settings Access with a supported destination and verify the exact in-app route, Android settings screen, browser URI, or external intent is opened.
 - [ ] Repeat with no handler, invalid destination, restricted profile, and failed launch; verify a recoverable message and unchanged source-screen state.
 
-- [ ] Test detected, manual, malformed, public, redirected, HTTP, HTTPS, and unreachable addresses; verify the exact destination is shown and requires user confirmation before launch.
+- [ ] Verify this action does not depend on a router address, does not open a browser, and returns to an unchanged Router Setup state after the Android panel or settings screen closes.
 
 ### 3. Compatibility Testing
 
@@ -37,7 +37,7 @@ The Router Setup screen uses Wi-Fi settings access to open the detected or manua
 ### 5. Security Testing
 
 - [ ] Verify Wi-Fi Settings Access validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify the explicit Android Settings intent carries no extras, URI, credentials, or network data and grants no permissions to another app.
 
 - [ ] Inspect intents, WebView usage, logs, storage, and network traffic; verify no credentials, default-password attempts, JavaScript bridge, automatic setting change, or unconfirmed navigation occurs.
 

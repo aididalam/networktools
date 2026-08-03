@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -131,6 +132,26 @@ fun NetworkToolsApp() {
                     themeChoice = themeChoice,
                     onThemeChoice = updateThemeChoice,
                 )
+                "converter" -> IpHostConverterScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
+                "ip-finder" -> IpFinderScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
+                "router-setup" -> RouterSetupScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
+                "wake-on-lan" -> WakeOnLanScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
                 else -> HomeScreen(
                     themeChoice = themeChoice,
                     onThemeChoice = updateThemeChoice,
@@ -180,7 +201,8 @@ private fun HomeScreen(
             columns = GridCells.Fixed(2),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
+                .padding(padding)
+                .testTag("tool_grid"),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(
                 start = 16.dp,
                 top = 12.dp,

@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Wake-on-LAN screen uses saved device management as part of a saved device profile or packet destination. Values are validated, stored in app-private local storage when applicable, and remain editable before a packet is sent.
+Saved cards expose explicit wake, edit, and delete actions. Edits revalidate every field and move the profile to most-recently-edited order; deletion requires confirmation; corrupt or duplicate records are discarded without damaging valid entries; authorization is required per send and is never persisted.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Wake-on-LAN screen uses saved device management as part of a saved device pr
 ### 5. Security Testing
 
 - [ ] Verify Saved Device Management validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify authorization state is never persisted, deletion removes only the selected identifier, all loaded and edited records are revalidated, and profiles remain excluded from backup, device transfer, logs, analytics, and crash messages.
 
 - [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 

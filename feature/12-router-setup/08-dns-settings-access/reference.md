@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Router Setup screen uses DNS settings access to open the detected or manually validated router address through the appropriate Android intent. The destination is shown before launch and unsupported, unsafe, or unreachable destinations are handled without a crash.
+The DNS action opens Android's Private DNS settings by explicit platform action and falls back to Network & Internet settings when a vendor build does not expose that deep link. Android owns validation and changes; the app neither supplies a provider hostname nor reads the current or resulting DNS configuration. Router-level DNS remains available only through the separately confirmed administration page.
 
 ## Google Play Policy Requirements
 
@@ -22,7 +22,7 @@ The Router Setup screen uses DNS settings access to open the detected or manuall
 - [ ] Invoke DNS Settings Access with a supported destination and verify the exact in-app route, Android settings screen, browser URI, or external intent is opened.
 - [ ] Repeat with no handler, invalid destination, restricted profile, and failed launch; verify a recoverable message and unchanged source-screen state.
 
-- [ ] Test detected, manual, malformed, public, redirected, HTTP, HTTPS, and unreachable addresses; verify the exact destination is shown and requires user confirmation before launch.
+- [ ] Verify this shortcut opens Android Private DNS rather than a guessed router page, and verify unsupported or profile-restricted devices show a recoverable message without changing Router Setup state.
 
 ### 3. Compatibility Testing
 
@@ -37,7 +37,7 @@ The Router Setup screen uses DNS settings access to open the detected or manuall
 ### 5. Security Testing
 
 - [ ] Verify DNS Settings Access validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify the Android Settings intent carries no DNS hostname, resolver value, URI, credential, or permission grant and the app receives no DNS configuration result.
 
 - [ ] Inspect intents, WebView usage, logs, storage, and network traffic; verify no credentials, default-password attempts, JavaScript bridge, automatic setting change, or unconfirmed navigation occurs.
 

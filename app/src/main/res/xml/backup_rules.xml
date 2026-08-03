@@ -11,4 +11,5 @@
     <exclude domain="sharedpref" path="wifi_analyzer_saved.xml" />
     <exclude domain="sharedpref" path="lan_scan_history.xml" />
     <exclude domain="sharedpref" path="port_scan_history.xml" />
+    <exclude domain="sharedpref" path="wake_on_lan_devices.xml" />
 </full-backup-content>

@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Router Setup screen uses Wi-Fi password settings access to open the detected or manually validated router address through the appropriate Android intent. The destination is shown before launch and unsupported, unsafe, or unreachable destinations are handled without a crash.
+The Wi-Fi passwords action opens Android's protected Wi-Fi settings area, where the operating system controls authentication and whether saved-network credentials can be viewed or shared. NetworkTools never requests, displays, reads, copies, or stores Wi-Fi passwords.
 
 ## Google Play Policy Requirements
 
@@ -22,7 +22,7 @@ The Router Setup screen uses Wi-Fi password settings access to open the detected
 - [ ] Invoke Wi-Fi Password Settings Access with a supported destination and verify the exact in-app route, Android settings screen, browser URI, or external intent is opened.
 - [ ] Repeat with no handler, invalid destination, restricted profile, and failed launch; verify a recoverable message and unchanged source-screen state.
 
-- [ ] Test detected, manual, malformed, public, redirected, HTTP, HTTPS, and unreachable addresses; verify the exact destination is shown and requires user confirmation before launch.
+- [ ] Verify this action does not depend on a router address and that any authentication, saved-network visibility, password display, or sharing remains entirely inside Android Settings.
 
 ### 3. Compatibility Testing
 
@@ -37,7 +37,7 @@ The Router Setup screen uses Wi-Fi password settings access to open the detected
 ### 5. Security Testing
 
 - [ ] Verify Wi-Fi Password Settings Access validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify the Android Settings intent has no extras or URI and the app cannot receive passwords, QR contents, authentication tokens, or a saved-network result.
 
 - [ ] Inspect intents, WebView usage, logs, storage, and network traffic; verify no credentials, default-password attempts, JavaScript bridge, automatic setting change, or unconfirmed navigation occurs.
 

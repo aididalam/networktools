@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Wake-on-LAN screen uses custom UDP port selection as part of a saved device profile or packet destination. Values are validated, stored in app-private local storage when applicable, and remain editable before a packet is sent.
+The editor accepts one numeric UDP port from 1-65535, provides familiar port 9 and port 7 presets, persists the exact validated value, and shows it again in confirmation before sending. Empty, signed, decimal, textual, and out-of-range values are blocked.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Wake-on-LAN screen uses custom UDP port selection as part of a saved device 
 ### 5. Security Testing
 
 - [ ] Verify Custom UDP Port Selection validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify the selected port is excluded from backup/device transfer and unrelated traffic, and that exactly one confirmed datagram uses the displayed normalized port.
 
 - [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 

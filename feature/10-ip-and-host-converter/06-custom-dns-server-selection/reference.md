@@ -7,7 +7,8 @@ The IP and Host Converter performs custom DNS server selection after validating 
 ## Google Play Policy Requirements
 
 - Run hostname and reverse-DNS operations only after an explicit user action for one validated target; do not provide bulk enumeration. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
-- Bound answer count, resolver requests, retries, timeout, input length, and custom resolver behavior; stop all work when the active conversion ends.
+- Bound answer count to 32, resolver requests to two, timeout to 1-3 seconds, input to 253 characters, and custom resolvers to numeric unicast addresses; stop all work when the active conversion ends.
+- Use direct DNS only; no paid API, API key, account, backend, advertising SDK, or remote history service is required.
 - Do not persist or transmit entered hosts, addresses, or DNS answers to analytics, advertising, or unrelated services. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
 
 ## Test Cases
@@ -31,13 +32,13 @@ The IP and Host Converter performs custom DNS server selection after validating 
 
 ### 4. Performance Testing
 
-- [ ] Measure opening and using Custom DNS Server Selection; verify work stays off the main thread where needed and UI frames remain responsive within the product performance budget.
+- [ ] Measure system and custom DNS selection followed by A, AAAA, and PTR queries; verify the UI remains responsive and completion respects the 1-3 second configured timeout.
 - [ ] Repeat the workflow at least 20 times and monitor memory, CPU, battery, sockets, and coroutine or callback counts; verify resources return to baseline after completion or cancellation.
 
 ### 5. Security Testing
 
 - [ ] Verify Custom DNS Server Selection validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify direct DNS traffic goes only to the displayed resolver; request local-network permission only when Android requires it for a local resolver, and write no inputs or answers to storage, logs, analytics, backups, or crash messages.
 
 - [ ] Inspect DNS traffic, logs, analytics, cache, and lifecycle behavior; verify only the displayed target reaches the selected resolver and no lookup continues in the background.
 

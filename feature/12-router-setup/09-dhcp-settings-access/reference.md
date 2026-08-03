@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Router Setup screen uses DHCP settings access to open the detected or manually validated router address through the appropriate Android intent. The destination is shown before launch and unsupported, unsafe, or unreachable destinations are handled without a crash.
+Because router vendors do not expose a standard DHCP deep link, this action opens only the validated router base page after showing the exact URL and receiving confirmation. The user navigates inside the external browser; NetworkTools does not guess a vendor path, inspect the page, or modify DHCP settings.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Router Setup screen uses DHCP settings access to open the detected or manual
 ### 5. Security Testing
 
 - [ ] Verify DHCP Settings Access validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify no vendor-specific DHCP path, automatic form submission, WebView, credential handling, configuration reading, or silent HTTP fallback exists.
 
 - [ ] Inspect intents, WebView usage, logs, storage, and network traffic; verify no credentials, default-password attempts, JavaScript bridge, automatic setting change, or unconfirmed navigation occurs.
 

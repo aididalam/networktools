@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Router Setup screen uses automatic router gateway detection to establish the router destination for later administration actions. Automatically detected and manually supplied values remain distinguishable and are validated before use.
+The Router Setup screen reads the active Wi-Fi or Ethernet `LinkProperties`, selects a platform-reported default-route gateway, and accepts it only when it is a numeric private or link-local IPv4/IPv6 address. The UI shows its detected source, interface, connection type, loading/error state, and a manual refresh action; it performs no discovery probe or internet request.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Router Setup screen uses automatic router gateway detection to establish the
 ### 5. Security Testing
 
 - [ ] Verify Automatic Router Gateway Detection validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify gateway detection uses only Android connectivity data, requests no new permission, makes no discovery or internet request, and writes no network identifier to storage, logs, analytics, backups, or crash messages.
 
 - [ ] Inspect intents, WebView usage, logs, storage, and network traffic; verify no credentials, default-password attempts, JavaScript bridge, automatic setting change, or unconfirmed navigation occurs.
 

@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Router Setup screen uses port forwarding settings access to open the detected or manually validated router address through the appropriate Android intent. The destination is shown before launch and unsupported, unsafe, or unreachable destinations are handled without a crash.
+Because router vendors do not expose a standard port-forwarding deep link, this action opens only the validated router base page after showing the exact URL and receiving confirmation. NetworkTools does not scan ports, guess a vendor path, create rules, submit forms, or read router configuration.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Router Setup screen uses port forwarding settings access to open the detecte
 ### 5. Security Testing
 
 - [ ] Verify Port Forwarding Settings Access validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify no vendor-specific path, automatic rule creation, WebView, credential handling, configuration reading, port scan, or silent HTTP fallback exists.
 
 - [ ] Inspect intents, WebView usage, logs, storage, and network traffic; verify no credentials, default-password attempts, JavaScript bridge, automatic setting change, or unconfirmed navigation occurs.
 

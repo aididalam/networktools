@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Wake-on-LAN tool builds a standards-compliant magic packet from the selected device's MAC address and sends it to the configured broadcast or target address and UDP port. Sending occurs only after validation and reports local socket or routing errors.
+After exact destination review and an authorization checkbox, the tool builds a 102-byte packet containing six `FF` bytes and exactly 16 copies of the selected six-byte MAC. It sends one UDP datagram off the main thread, enforces a two-second rate limit, reports socket/routing errors, and states that transmission does not prove the device woke.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Wake-on-LAN tool builds a standards-compliant magic packet from the selected
 ### 5. Security Testing
 
 - [ ] Verify Magic Packet Sending validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify one explicit confirmation produces one 102-byte datagram with no retry, scheduler, worker, service, background continuation, telemetry, or result log; confirm errors expose no internal exception details.
 
 - [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 

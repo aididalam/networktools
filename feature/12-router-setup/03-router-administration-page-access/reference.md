@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Router Setup screen uses router administration page access to open the detected or manually validated router address through the appropriate Android intent. The destination is shown before launch and unsupported, unsafe, or unreachable destinations are handled without a crash.
+After validation, the screen constructs only the selected scheme plus normalized router host, displays that exact base URL in a confirmation dialog, and launches it with an external browsable Android intent only after confirmation. It does not guess vendor paths, check reachability, use a WebView, submit credentials, or read the resulting page.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Router Setup screen uses router administration page access to open the detec
 ### 5. Security Testing
 
 - [ ] Verify Router Administration Page Access validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify the intent is external and browsable, contains only the confirmed base URL, grants no URI permissions, and does not expose credentials, cookies, page content, referrers, or configuration data.
 
 - [ ] Inspect intents, WebView usage, logs, storage, and network traffic; verify no credentials, default-password attempts, JavaScript bridge, automatic setting change, or unconfirmed navigation occurs.
 

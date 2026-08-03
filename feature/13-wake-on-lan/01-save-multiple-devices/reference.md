@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Wake-on-LAN screen uses save multiple devices as part of a saved device profile or packet destination. Values are validated, stored in app-private local storage when applicable, and remain editable before a packet is sent.
+The Wake-on-LAN screen stores up to 30 validated local or remote device profiles in deterministic most-recently-edited order. Each profile has a random identifier and creation/update timestamps, malformed persisted records fail closed, and the complete store is excluded from cloud backup and device transfer.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Wake-on-LAN screen uses save multiple devices as part of a saved device prof
 ### 5. Security Testing
 
 - [ ] Verify Save Multiple Devices validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify profiles remain in the app-private `wake_on_lan_devices` preferences file, are excluded from backup/device transfer, and never enter logs, analytics, crash messages, exports, or network traffic other than the confirmed packet fields.
 
 - [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 

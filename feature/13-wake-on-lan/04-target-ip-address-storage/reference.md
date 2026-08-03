@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Wake-on-LAN screen uses target IP address storage as part of a saved device profile or packet destination. Values are validated, stored in app-private local storage when applicable, and remain editable before a packet is sent.
+Local profiles require a numeric private IPv4 device address and revalidate that it belongs to the active Wi-Fi/Ethernet subnet before sending. Remote profiles require a bounded hostname or IP that resolves to public unicast; URLs, paths, credentials, whitespace, local, multicast, and special-use results are rejected.
 
 ## Google Play Policy Requirements
 
@@ -37,7 +37,7 @@ The Wake-on-LAN screen uses target IP address storage as part of a saved device 
 ### 5. Security Testing
 
 - [ ] Verify Target IP Address Storage validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify targets are excluded from backup/device transfer, logs, analytics, and crash messages; remote DNS resolution is bounded to eight answers and only the confirmed destination receives a datagram.
 
 - [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 
