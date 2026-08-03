@@ -56,6 +56,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -102,7 +103,7 @@ fun DnsLookupScreen(
     var recordType by rememberSaveable { mutableStateOf(DnsRecordType.A) }
     var resolverMode by rememberSaveable { mutableStateOf(DnsResolverMode.SYSTEM) }
     var customResolver by rememberSaveable { mutableStateOf(DnsLookupRepository.PublicResolvers.first().address) }
-    var timeout by rememberSaveable { mutableStateOf(DnsQueryConfig.DefaultTimeoutMillis) }
+    var timeout by rememberSaveable { mutableIntStateOf(DnsQueryConfig.DefaultTimeoutMillis) }
 
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         viewModel.continueAfterPermission(granted)

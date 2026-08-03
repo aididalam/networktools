@@ -38,7 +38,7 @@ val ToolCategories = listOf(
     ToolCategory("06", "lan-scanner", "LAN Scanner", Icons.Outlined.Lan, Color(0xFF348096), true),
     ToolCategory("07", "port-scanner", "Port Scanner", Icons.Outlined.Search, Color(0xFF6F7C38), true),
     ToolCategory("08", "dns-lookup", "DNS Lookup", Icons.Outlined.Dns, Color(0xFF4069A3), true),
-    ToolCategory("09", "ip-calculator", "IP Calculator", Icons.Outlined.Calculate, Color(0xFFA65D36)),
+    ToolCategory("09", "ip-calculator", "IP Calculator", Icons.Outlined.Calculate, Color(0xFFA65D36), true),
     ToolCategory("10", "converter", "IP & Host Converter", Icons.AutoMirrored.Outlined.CompareArrows, Color(0xFF71599B)),
     ToolCategory("11", "ip-finder", "IP Finder", Icons.Outlined.Cable, Color(0xFF2C8273)),
     ToolCategory("12", "router-setup", "Router Setup", Icons.Outlined.Router, Color(0xFFAA6C18)),

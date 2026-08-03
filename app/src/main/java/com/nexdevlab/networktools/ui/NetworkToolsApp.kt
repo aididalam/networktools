@@ -126,6 +126,11 @@ fun NetworkToolsApp() {
                     themeChoice = themeChoice,
                     onThemeChoice = updateThemeChoice,
                 )
+                "ip-calculator" -> IpCalculatorScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
                 else -> HomeScreen(
                     themeChoice = themeChoice,
                     onThemeChoice = updateThemeChoice,

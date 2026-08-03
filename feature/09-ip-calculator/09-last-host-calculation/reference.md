@@ -31,13 +31,13 @@ The IP Calculator derives last host calculation locally from validated IPv4 or I
 
 ### 4. Performance Testing
 
-- [ ] Measure opening and using Last Host Calculation; verify work stays off the main thread where needed and UI frames remain responsive within the product performance budget.
+- [ ] Measure opening and using Last Host Calculation with IPv4 /0 and IPv6 /0 values; verify 128-bit arithmetic completes promptly without blocking UI frames.
 - [ ] Repeat the workflow at least 20 times and monitor memory, CPU, battery, sockets, and coroutine or callback counts; verify resources return to baseline after completion or cancellation.
 
 ### 5. Security Testing
 
 - [ ] Verify Last Host Calculation validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify the calculator requests no runtime or network permission, opens no socket, persists no input or result, and writes no address data to logs, analytics, backups, or crash messages.
 
 - [ ] Inspect manifest permissions, network traffic, logs, analytics, and storage while calculating; verify inputs and results never leave the documented on-device workflow.
 
@@ -49,4 +49,4 @@ The IP Calculator derives last host calculation locally from validated IPv4 or I
 ### 7. Interruption Testing
 
 - [ ] During Last Host Calculation, rotate, resize, background and foreground the app, lock and unlock the device, and trigger process recreation; verify committed state is restored and transient actions are not repeated.
-- [ ] Interrupt with Wi-Fi or mobile switching, VPN changes, airplane mode, permission revocation, and network loss or recovery where applicable; verify cancellation, retry, and final status remain accurate.
+- [ ] Switch Wi-Fi, mobile data, VPN, and airplane mode while calculating; verify the result is unchanged because calculation is local and does not depend on connectivity.
