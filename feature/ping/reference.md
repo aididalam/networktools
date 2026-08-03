@@ -1,0 +1,21 @@
+# Ping
+
+- [ ] Hostname Ping
+- [ ] IP-address Ping
+- [ ] ICMP Ping
+- [ ] TCP Ping
+- [ ] Configurable packet count
+- [ ] Configurable packet size
+- [ ] Configurable timeout
+- [ ] Configurable packet interval
+- [ ] Individual response times
+- [ ] TTL information
+- [ ] Sent-packet count
+- [ ] Received-packet count
+- [ ] Lost-packet count
+- [ ] Packet-loss percentage
+- [ ] Minimum latency
+- [ ] Maximum latency
+- [ ] Average latency
+- [ ] Stop active Ping
+- [ ] Ping history

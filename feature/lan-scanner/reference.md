@@ -1,0 +1,23 @@
+# LAN Scanner
+
+- [ ] Automatic subnet detection
+- [ ] Manual subnet entry
+- [ ] Fast network scan
+- [ ] Deep network scan
+- [ ] Connected-device discovery
+- [ ] Device IP-address detection
+- [ ] Device hostname detection
+- [ ] Device MAC-address detection
+- [ ] Device manufacturer detection
+- [ ] Device-type estimation
+- [ ] ARP discovery
+- [ ] Ping discovery
+- [ ] mDNS discovery
+- [ ] Bonjour discovery
+- [ ] SSDP discovery
+- [ ] UPnP discovery
+- [ ] SNMP discovery
+- [ ] NetBIOS discovery
+- [ ] Device-details view
+- [ ] Unknown-device identification
+- [ ] LAN scan history
