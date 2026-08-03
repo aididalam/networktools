@@ -63,6 +63,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nexdevlab.networktools.data.IpInformationViewModel
 import com.nexdevlab.networktools.data.NetworkSnapshot
+import com.nexdevlab.networktools.ui.theme.ThemeChoice
 import java.text.DateFormat
 import java.util.Date
 import kotlinx.coroutines.launch
@@ -71,6 +72,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun IpInformationScreen(
     onBack: () -> Unit,
+    themeChoice: ThemeChoice,
+    onThemeChoice: (ThemeChoice) -> Unit,
     viewModel: IpInformationViewModel = viewModel(),
 ) {
     val context = LocalContext.current
@@ -131,6 +134,12 @@ fun IpInformationScreen(
                     ) {
                         Icon(Icons.Outlined.Share, contentDescription = "Share network information")
                     }
+                    AppOverflowMenu(
+                        themeChoice = themeChoice,
+                        onThemeChoice = onThemeChoice,
+                        helpText = "This screen reads the active connection while it is visible. " +
+                            "Wi-Fi network names and BSSIDs remain hidden until you grant access.",
+                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,

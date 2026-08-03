@@ -31,7 +31,7 @@ data class ToolCategory(
 
 val ToolCategories = listOf(
     ToolCategory("01", "ip-information", "IP Information", Icons.Outlined.Info, Color(0xFF1B8A78), true),
-    ToolCategory("02", "whois", "WHOIS Lookup", Icons.Outlined.Public, Color(0xFF5378B7)),
+    ToolCategory("02", "whois", "WHOIS Lookup", Icons.Outlined.Public, Color(0xFF5378B7), true),
     ToolCategory("03", "ping", "Ping", Icons.Outlined.CellTower, Color(0xFFC0733A)),
     ToolCategory("04", "traceroute", "Traceroute", Icons.Outlined.Route, Color(0xFF7B67B3)),
     ToolCategory("05", "wifi-analyzer", "Wi-Fi Analyzer", Icons.Outlined.Radar, Color(0xFFC24D67)),

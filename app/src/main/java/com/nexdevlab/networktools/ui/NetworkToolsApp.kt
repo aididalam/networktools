@@ -14,15 +14,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.NetworkCheck
+import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -44,18 +49,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.nexdevlab.networktools.ui.theme.NetworkToolsTheme
 import com.nexdevlab.networktools.ui.theme.ThemeChoice
 
 private const val PreferencesName = "network_tools_preferences"
 private const val ThemeKey = "theme_choice"
+internal const val PrivacyPolicyUrl = ""
 
 @Composable
 fun NetworkToolsApp() {
@@ -73,16 +79,26 @@ fun NetworkToolsApp() {
     }
 
     NetworkToolsTheme(themeChoice) {
+        val updateThemeChoice: (ThemeChoice) -> Unit = {
+            themeChoice = it
+            preferences.edit().putString(ThemeKey, it.name).apply()
+        }
         BackHandler(enabled = route != "home") { route = "home" }
         key(route) {
             when (route) {
-                "ip-information" -> IpInformationScreen(onBack = { route = "home" })
+                "ip-information" -> IpInformationScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
+                "whois" -> WhoisLookupScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
                 else -> HomeScreen(
                     themeChoice = themeChoice,
-                    onThemeChoice = {
-                        themeChoice = it
-                        preferences.edit().putString(ThemeKey, it.name).apply()
-                    },
+                    onThemeChoice = updateThemeChoice,
                     onOpenTool = { route = it },
                 )
             }
@@ -97,7 +113,6 @@ private fun HomeScreen(
     onThemeChoice: (ThemeChoice) -> Unit,
     onOpenTool: (String) -> Unit,
 ) {
-    var themeDialogOpen by rememberSaveable { mutableStateOf(false) }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
@@ -113,9 +128,12 @@ private fun HomeScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { themeDialogOpen = true }) {
-                        Icon(Icons.Outlined.DarkMode, contentDescription = "Choose theme")
-                    }
+                    AppOverflowMenu(
+                        themeChoice = themeChoice,
+                        onThemeChoice = onThemeChoice,
+                        helpText = "Open an available tool to view current network information. " +
+                            "Run diagnostics only against networks and systems you own or are authorized to test.",
+                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
@@ -123,7 +141,8 @@ private fun HomeScreen(
             )
         },
     ) { padding ->
-        LazyColumn(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
@@ -133,21 +152,123 @@ private fun HomeScreen(
                 end = 16.dp,
                 bottom = 28.dp,
             ),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            item {
-                IpOverviewBand(onClick = { onOpenTool("ip-information") })
+            items(ToolCategories, key = { it.number }) { tool ->
+                ToolCard(tool = tool, onClick = { onOpenTool(tool.route) })
             }
-            item {
+        }
+    }
+}
+
+@Composable
+private fun ToolCard(tool: ToolCategory, onClick: () -> Unit) {
+    val modifier = if (tool.available) {
+        Modifier.clickable(onClick = onClick)
+    } else {
+        Modifier
+    }
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(136.dp)
+            .then(modifier),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        shape = RoundedCornerShape(28.dp),
+    ) {
+        Box(Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+            ) {
+                Surface(
+                    modifier = Modifier.size(48.dp),
+                    shape = RoundedCornerShape(15.dp),
+                    color = tool.accent.copy(alpha = 0.14f),
+                    contentColor = tool.accent,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(tool.icon, contentDescription = null, modifier = Modifier.size(25.dp))
+                    }
+                }
                 Text(
-                    text = "Tools",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(top = 18.dp, bottom = 4.dp),
+                    text = tool.title,
+                    color = if (tool.available) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                    fontSize = 17.sp,
+                    lineHeight = 21.sp,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                    maxLines = 2,
+                    modifier = Modifier.padding(top = 14.dp),
                 )
             }
-            items(ToolCategories, key = { it.number }) { tool ->
-                ToolRow(tool = tool, onClick = { onOpenTool(tool.route) })
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 18.dp, end = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = if (tool.available) Icons.Outlined.ChevronRight else Icons.Outlined.Lock,
+                    contentDescription = if (tool.available) null else "Not available yet",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp),
+                )
             }
+        }
+    }
+}
+
+@Composable
+internal fun AppOverflowMenu(
+    themeChoice: ThemeChoice,
+    onThemeChoice: (ThemeChoice) -> Unit,
+    helpText: String,
+) {
+    val uriHandler = LocalUriHandler.current
+    var menuOpen by remember { mutableStateOf(false) }
+    var themeDialogOpen by rememberSaveable { mutableStateOf(false) }
+    var helpDialogOpen by rememberSaveable { mutableStateOf(false) }
+
+    Box {
+        IconButton(onClick = { menuOpen = true }) {
+            Icon(Icons.Outlined.MoreVert, contentDescription = "More options")
+        }
+        DropdownMenu(
+            expanded = menuOpen,
+            onDismissRequest = { menuOpen = false },
+        ) {
+            DropdownMenuItem(
+                text = { Text("Theme") },
+                leadingIcon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
+                onClick = {
+                    menuOpen = false
+                    themeDialogOpen = true
+                },
+            )
+            DropdownMenuItem(
+                text = { Text("Help") },
+                leadingIcon = { Icon(Icons.AutoMirrored.Outlined.HelpOutline, contentDescription = null) },
+                onClick = {
+                    menuOpen = false
+                    helpDialogOpen = true
+                },
+            )
+            DropdownMenuItem(
+                text = { Text("Privacy policy") },
+                leadingIcon = { Icon(Icons.Outlined.PrivacyTip, contentDescription = null) },
+                enabled = PrivacyPolicyUrl.isNotBlank(),
+                onClick = {
+                    menuOpen = false
+                    uriHandler.openUri(PrivacyPolicyUrl)
+                },
+            )
         }
     }
 
@@ -158,97 +279,15 @@ private fun HomeScreen(
             onDismiss = { themeDialogOpen = false },
         )
     }
-}
-
-@Composable
-private fun IpOverviewBand(onClick: () -> Unit) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        color = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        shape = RoundedCornerShape(8.dp),
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Surface(
-                modifier = Modifier.size(48.dp),
-                shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Outlined.NetworkCheck, contentDescription = null)
-                }
-            }
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 14.dp),
-            ) {
-                Text("IP Information", style = MaterialTheme.typography.titleLarge)
-                Text(
-                    "Connection and address details",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.76f),
-                )
-            }
-            Icon(Icons.Outlined.ChevronRight, contentDescription = null)
-        }
-    }
-}
-
-@Composable
-private fun ToolRow(tool: ToolCategory, onClick: () -> Unit) {
-    val modifier = if (tool.available) {
-        Modifier.clickable(onClick = onClick)
-    } else {
-        Modifier.alpha(0.62f)
-    }
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(68.dp)
-            .then(modifier),
-        color = MaterialTheme.colorScheme.surface,
-        shape = RoundedCornerShape(8.dp),
-        tonalElevation = 1.dp,
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Surface(
-                modifier = Modifier.size(40.dp),
-                shape = RoundedCornerShape(8.dp),
-                color = tool.accent.copy(alpha = 0.14f),
-                contentColor = tool.accent,
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(tool.icon, contentDescription = null, modifier = Modifier.size(22.dp))
-                }
-            }
-            Text(
-                text = tool.number,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = 12.dp).width(28.dp),
-            )
-            Text(
-                text = tool.title,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f),
-            )
-            Icon(
-                imageVector = if (tool.available) Icons.Outlined.ChevronRight else Icons.Outlined.Lock,
-                contentDescription = if (tool.available) null else "Not available yet",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(20.dp),
-            )
-        }
+    if (helpDialogOpen) {
+        AlertDialog(
+            onDismissRequest = { helpDialogOpen = false },
+            title = { Text("Help") },
+            text = { Text(helpText) },
+            confirmButton = {
+                TextButton(onClick = { helpDialogOpen = false }) { Text("Close") }
+            },
+        )
     }
 }
 
