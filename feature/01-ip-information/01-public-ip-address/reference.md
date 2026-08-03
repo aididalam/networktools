@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The IP Information screen obtains public IP address from Android connectivity and Wi-Fi APIs or, when internet intelligence is required, from the configured HTTPS provider. It displays a normalized value and an explicit unavailable or permission-required state when the value cannot be read.
+The IP Information screen obtains the internet-facing IPv4 or IPv6 address from a keyless HTTPS IP-echo endpoint. The response is strictly validated as an IP address, and timeout, offline, and invalid-response states are shown without retaining stale data.
 
 ## Test Cases
 
@@ -13,8 +13,8 @@ The IP Information screen obtains public IP address from Android connectivity an
 
 ### 2. Functional Testing
 
-- [ ] Provide controlled platform or provider data for Public IP Address and verify the IP Information screen displays the exact normalized expected value.
-- [ ] Verify unavailable permissions, invalid or absent data, timeout, and provider or platform errors produce the documented fallback without stale or fabricated public IP address data.
+- [ ] Return controlled IPv4 and IPv6 responses from the keyless IP-echo endpoint and verify exact parsing, normalization, and display.
+- [ ] Test offline, timeout, HTTP failure, redirects, oversized bodies, HTML, and malformed address responses; verify no stale or fabricated public IP is shown.
 
 ### 3. Compatibility Testing
 

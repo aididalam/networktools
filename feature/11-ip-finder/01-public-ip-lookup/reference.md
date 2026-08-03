@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The IP Finder obtains public IP lookup for a validated public IP or resolved domain through the configured HTTPS intelligence provider. Provider confidence and unavailable fields are preserved, and approximate location data is never presented as exact.
+The IP Finder requests the device's internet-facing IPv4 or IPv6 address from a keyless HTTPS IP-echo endpoint and validates the response before display. It provides explicit offline, timeout, HTTP-error, and invalid-response states.
 
 ## Test Cases
 
@@ -13,8 +13,8 @@ The IP Finder obtains public IP lookup for a validated public IP or resolved dom
 
 ### 2. Functional Testing
 
-- [ ] Use a controlled resolver or response fixture with known Public IP Lookup data and verify query construction, parsing, normalization, and displayed output.
-- [ ] Test malformed input, no-record responses, referral or multiple-answer responses, timeout, truncated data, and server failure; verify distinct outcomes.
+- [ ] Return controlled IPv4 and IPv6 endpoint responses and verify the displayed address exactly matches the normalized response.
+- [ ] Test timeout, offline, HTTP errors, redirects, oversized bodies, HTML, private addresses, and malformed responses; verify distinct error outcomes.
 
 ### 3. Compatibility Testing
 

@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The IP Finder obtains domain to IP resolution for a validated public IP or resolved domain through the configured HTTPS intelligence provider. Provider confidence and unavailable fields are preserved, and approximate location data is never presented as exact.
+The IP Finder validates the domain and resolves its A and AAAA records using Android's active DNS configuration or a user-selected DNS server. Resolution uses standard DNS directly and requires no API account or key.
 
 ## Test Cases
 

@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The IP Information screen obtains network organization from Android connectivity and Wi-Fi APIs or, when internet intelligence is required, from the configured HTTPS provider. It displays a normalized value and an explicit unavailable or permission-required state when the value cannot be read.
+After obtaining the public IP address, the app selects the authoritative Regional Internet Registry through the public IANA RDAP bootstrap registry and reads the registered network organization from its keyless HTTPS RDAP response. Missing or redacted entities are shown as unavailable.
 
 ## Test Cases
 
@@ -13,8 +13,8 @@ The IP Information screen obtains network organization from Android connectivity
 
 ### 2. Functional Testing
 
-- [ ] Provide controlled platform or provider data for Network Organization and verify the IP Information screen displays the exact normalized expected value.
-- [ ] Verify unavailable permissions, invalid or absent data, timeout, and provider or platform errors produce the documented fallback without stale or fabricated network organization data.
+- [ ] Use controlled IANA bootstrap and RDAP fixtures and verify the correct registry is selected and the registered network organization is parsed exactly.
+- [ ] Test unallocated, private, reserved, redirected, rate-limited, malformed, and redacted RDAP responses; verify the documented unavailable state.
 
 ### 3. Compatibility Testing
 

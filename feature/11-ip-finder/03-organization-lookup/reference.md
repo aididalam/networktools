@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The IP Finder obtains organization lookup for a validated public IP or resolved domain through the configured HTTPS intelligence provider. Provider confidence and unavailable fields are preserved, and approximate location data is never presented as exact.
+The IP Finder resolves the target to a public IP, selects the authoritative registry from the public IANA RDAP bootstrap data, and parses the registered network organization from keyless RDAP over HTTPS. Redacted or missing organization data is not inferred.
 
 ## Test Cases
 
@@ -13,8 +13,8 @@ The IP Finder obtains organization lookup for a validated public IP or resolved 
 
 ### 2. Functional Testing
 
-- [ ] Use a controlled resolver or response fixture with known Organization Lookup data and verify query construction, parsing, normalization, and displayed output.
-- [ ] Test malformed input, no-record responses, referral or multiple-answer responses, timeout, truncated data, and server failure; verify distinct outcomes.
+- [ ] Use controlled DNS, IANA bootstrap, and RDAP fixtures and verify the correct public IP and authoritative registered organization are displayed.
+- [ ] Test private and reserved targets, missing entities, redaction, referrals, rate limits, timeout, and malformed RDAP; verify distinct outcomes.
 
 ### 3. Compatibility Testing
 

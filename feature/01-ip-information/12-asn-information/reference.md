@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The IP Information screen obtains ASN information from Android connectivity and Wi-Fi APIs or, when internet intelligence is required, from the configured HTTPS provider. It displays a normalized value and an explicit unavailable or permission-required state when the value cannot be read.
+After obtaining the public IP address, the app performs a keyless DNS IP-to-ASN query and confirms available registration details through IANA-selected authoritative RDAP. Private, reserved, or unmapped addresses show an unavailable result.
 
 ## Test Cases
 
@@ -13,8 +13,8 @@ The IP Information screen obtains ASN information from Android connectivity and 
 
 ### 2. Functional Testing
 
-- [ ] Provide controlled platform or provider data for ASN Information and verify the IP Information screen displays the exact normalized expected value.
-- [ ] Verify unavailable permissions, invalid or absent data, timeout, and provider or platform errors produce the documented fallback without stale or fabricated ASN information data.
+- [ ] Return controlled IP-to-ASN DNS and RDAP fixtures and verify the origin ASN, prefix, and registered name are normalized and associated with the correct IP.
+- [ ] Test private, reserved, unmapped, multi-origin, malformed, timeout, and rate-limited responses; verify no ASN is guessed from incomplete data.
 
 ### 3. Compatibility Testing
 

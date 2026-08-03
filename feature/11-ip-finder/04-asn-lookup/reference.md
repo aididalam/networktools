@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The IP Finder obtains ASN lookup for a validated public IP or resolved domain through the configured HTTPS intelligence provider. Provider confidence and unavailable fields are preserved, and approximate location data is never presented as exact.
+The IP Finder resolves the target to a public IP, obtains its origin ASN through a keyless DNS IP-to-ASN query, and supplements it with authoritative RDAP registration data when available. Private, reserved, unmapped, and multi-origin results remain explicitly identified.
 
 ## Test Cases
 
@@ -13,8 +13,8 @@ The IP Finder obtains ASN lookup for a validated public IP or resolved domain th
 
 ### 2. Functional Testing
 
-- [ ] Use a controlled resolver or response fixture with known ASN Lookup data and verify query construction, parsing, normalization, and displayed output.
-- [ ] Test malformed input, no-record responses, referral or multiple-answer responses, timeout, truncated data, and server failure; verify distinct outcomes.
+- [ ] Use controlled DNS origin-ASN and RDAP fixtures and verify the ASN, routed prefix, and registered name correspond to the resolved public IP.
+- [ ] Test private, reserved, unmapped, multi-origin, timeout, malformed, and rate-limited responses; verify no ASN is guessed.
 
 ### 3. Compatibility Testing
 
