@@ -6,8 +6,9 @@
    See https://developer.android.com/about/versions/12/backup-restore
 -->
 <full-backup-content>
-    <!--
-   <include domain="sharedpref" path="."/>
-   <exclude domain="sharedpref" path="device.xml"/>
--->
+    <exclude domain="sharedpref" path="ping_history.xml" />
+    <exclude domain="sharedpref" path="traceroute_history.xml" />
+    <exclude domain="sharedpref" path="wifi_analyzer_saved.xml" />
+    <exclude domain="sharedpref" path="lan_scan_history.xml" />
+    <exclude domain="sharedpref" path="port_scan_history.xml" />
 </full-backup-content>

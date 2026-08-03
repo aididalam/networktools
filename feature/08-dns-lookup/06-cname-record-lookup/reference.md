@@ -9,6 +9,9 @@ The DNS Lookup screen performs cname record lookup for the validated name throug
 - Execute only user-initiated, bounded DNS questions for the displayed name and selected resolver. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
 - Validate names, record types, resolver addresses, message sizes, retry counts, and timeouts; do not implement amplification, spoofing, reflection, bulk enumeration, or background querying.
 - Respect active Private DNS behavior and clearly identify when a custom resolver changes the normal protected resolution path.
+- Build and parse bounded DNS messages on-device with the embedded BSD-licensed dnsjava library; do not use a paid API, API key, hosted lookup backend, analytics provider, proxy list, or remotely supplied resolver list.
+- Limit each user action to one displayed DNS name, one resolver or the fixed four-resolver comparison, a 1-3 second timeout, a 1,232-byte EDNS UDP payload, one TCP retry only after truncation, and at most 100 displayed records.
+- For a private-LAN resolver, request Nearby Devices only immediately before an Android 16 query when local-network protection applies. When targeting Android 17 or later, migrate to `ACCESS_LOCAL_NETWORK` and preserve denial and revocation behavior.
 
 ## Test Cases
 
@@ -28,6 +31,7 @@ The DNS Lookup screen performs cname record lookup for the validated name throug
 
 - [ ] Verify CNAME Record Lookup on the minimum supported Android API, the target API, and the latest available API across representative Pixel and non-Pixel devices.
 - [ ] Verify behavior on Wi-Fi, mobile data, VPN, IPv4-only, IPv6-only, dual-stack, offline, and platform-restricted configurations where the feature applies.
+- [ ] On Android 16, verify a private resolver requests Nearby Devices only after the user starts a query and handles denial or revocation safely; on Android 17 or later, repeat with `ACCESS_LOCAL_NETWORK`.
 
 ### 4. Performance Testing
 
@@ -37,7 +41,8 @@ The DNS Lookup screen performs cname record lookup for the validated name throug
 ### 5. Security Testing
 
 - [ ] Verify CNAME Record Lookup validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
-- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Verify least-privilege permissions, app-private transient state, and no DNS names, resolver addresses, or results in production logs, analytics, backups, or crash messages.
+- [ ] Inspect the packaged app and captured traffic; verify there is no hosted lookup service, paid or keyed API, analytics upload, background query, automatic enumeration, or resolver download.
 
 - [ ] Capture DNS traffic and malformed responses; verify requests use the displayed resolver and record type, reject amplification-oriented payloads, avoid leaking unrelated names, and stop after the active lookup.
 

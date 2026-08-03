@@ -5,15 +5,17 @@
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
+        <exclude domain="sharedpref" path="ping_history.xml" />
+        <exclude domain="sharedpref" path="traceroute_history.xml" />
+        <exclude domain="sharedpref" path="wifi_analyzer_saved.xml" />
+        <exclude domain="sharedpref" path="lan_scan_history.xml" />
+        <exclude domain="sharedpref" path="port_scan_history.xml" />
     </cloud-backup>
-    <!--
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <exclude domain="sharedpref" path="ping_history.xml" />
+        <exclude domain="sharedpref" path="traceroute_history.xml" />
+        <exclude domain="sharedpref" path="wifi_analyzer_saved.xml" />
+        <exclude domain="sharedpref" path="lan_scan_history.xml" />
+        <exclude domain="sharedpref" path="port_scan_history.xml" />
     </device-transfer>
-    -->
 </data-extraction-rules>

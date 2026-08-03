@@ -96,6 +96,36 @@ fun NetworkToolsApp() {
                     themeChoice = themeChoice,
                     onThemeChoice = updateThemeChoice,
                 )
+                "ping" -> PingScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
+                "traceroute" -> TracerouteScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
+                "wifi-analyzer" -> WifiAnalyzerScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
+                "lan-scanner" -> LanScannerScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
+                "port-scanner" -> PortScannerScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
+                "dns-lookup" -> DnsLookupScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
                 else -> HomeScreen(
                     themeChoice = themeChoice,
                     onThemeChoice = updateThemeChoice,

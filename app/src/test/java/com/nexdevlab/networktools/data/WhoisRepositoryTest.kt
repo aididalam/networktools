@@ -1,5 +1,6 @@
 package com.nexdevlab.networktools.data
 
+import java.net.InetAddress
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
@@ -43,6 +44,16 @@ class WhoisRepositoryTest {
                 WhoisRepository.normalizeWhoisServer(it)
             }
         }
+    }
+
+    @Test
+    fun serverAddressPolicyRejectsLocalPrivateAndReservedDestinations() {
+        listOf("127.0.0.1", "10.0.0.1", "192.168.1.1", "100.64.0.1", "192.0.2.1", "::1", "fc00::1")
+            .forEach { address ->
+                assertTrue(!WhoisRepository.isPublicAddress(InetAddress.getByName(address)))
+            }
+        assertTrue(WhoisRepository.isPublicAddress(InetAddress.getByName("8.8.8.8")))
+        assertTrue(WhoisRepository.isPublicAddress(InetAddress.getByName("2001:4860:4860::8888")))
     }
 
     @Test
@@ -93,8 +104,15 @@ class WhoisRepositoryTest {
                     "whois.arin.net",
                     """
                         NetRange: 8.8.8.0 - 8.8.8.255
+                        NetName: GOGL
                         OrgName: Google LLC
-                        OriginAS: AS15169
+                    """.trimIndent(),
+                ),
+                WhoisRepository.ServerResponse(
+                    "whois.cymru.com",
+                    """
+                        AS | IP | BGP Prefix | CC | Registry | Allocated | AS Name
+                        15169 | 8.8.8.8 | 8.8.8.0/24 | US | arin | 2023-12-28 | GOOGLE, US
                     """.trimIndent(),
                 ),
             ),

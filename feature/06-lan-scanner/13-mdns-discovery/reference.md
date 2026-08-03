@@ -9,6 +9,8 @@ The LAN Scanner applies mDNS discovery within the validated local subnet and mer
 - Default scanning to the active private LAN only, require explicit user start and authorization acknowledgement, and reject public internet ranges or oversized subnets. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
 - Enforce conservative host, protocol, timeout, retry, and concurrency limits; stop immediately on cancellation or when the active scan ends.
 - Limit behavior to discovery and identification; do not add exploitation, credential guessing, vulnerability bypass, stealth, persistence, or hidden background scanning.
+- Request Nearby Devices only just before an Android 16 local-network operation when local-network protection applies; when targeting Android 17 or higher, migrate this gate to `ACCESS_LOCAL_NETWORK` and preserve denial and revocation handling.
+- Treat IP addresses, hostnames, MAC addresses, and service advertisements as sensitive local data: keep them on-device, exclude history from backup and device transfer, and do not send them to analytics or remote providers.
 
 ## Test Cases
 

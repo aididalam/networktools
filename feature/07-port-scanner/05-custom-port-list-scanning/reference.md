@@ -9,6 +9,9 @@ The Port Scanner applies custom port list scanning to a validated target and bou
 - Scan only a single displayed host supplied or confirmed by the user, require an authorized-use acknowledgement, and start only from an explicit action. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
 - Bound the port count, range, custom list, timeout, retries, and concurrency; reject duplicate, malformed, oversized, or automation-style requests.
 - Detect connection state and common services only; do not implement exploitation, banner attacks, authentication attempts, evasion, stealth, or background scanning.
+- Implement scanning directly with bounded TCP socket connections; do not use a third-party scanning service, paid API, API key, telemetry provider, or remotely supplied proxy list.
+- For private-LAN targets, request Nearby Devices only immediately before an Android 16 operation when local-network protection applies. When targeting Android 17 or later, migrate to `ACCESS_LOCAL_NETWORK` and preserve denial and revocation behavior.
+- Keep targets, results, and history in app-private on-device storage, exclude them from device backup, and never send them to analytics, advertising, or crash-reporting services.
 
 ## Test Cases
 
@@ -28,6 +31,7 @@ The Port Scanner applies custom port list scanning to a validated target and bou
 
 - [ ] Verify Custom Port List Scanning on the minimum supported Android API, the target API, and the latest available API across representative Pixel and non-Pixel devices.
 - [ ] Verify behavior on Wi-Fi, mobile data, VPN, IPv4-only, IPv6-only, dual-stack, offline, and platform-restricted configurations where the feature applies.
+- [ ] On Android 16, verify a private-LAN scan requests Nearby Devices only when the user starts it and handles denial or revocation safely; on Android 17 or later, repeat with `ACCESS_LOCAL_NETWORK`.
 
 ### 4. Performance Testing
 
@@ -38,6 +42,7 @@ The Port Scanner applies custom port list scanning to a validated target and bou
 
 - [ ] Verify Custom Port List Scanning validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+- [ ] Inspect the build, captured traffic, and backup output; verify there is no paid or keyed scanning provider, no analytics upload, and no backed-up target, result, or history data.
 
 - [ ] Capture traffic for success, timeout, cancel, navigation, and backgrounding; verify connections go only to the displayed host and ports, contain no exploit or credential payloads, and terminate promptly.
 

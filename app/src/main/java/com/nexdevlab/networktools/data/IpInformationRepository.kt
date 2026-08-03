@@ -372,7 +372,7 @@ class IpInformationRepository(private val context: Context) {
             address.hostAddress.orEmpty().substringBefore('%')
 
         private fun String.cleanSsid(): String? = trim('"')
-            .takeUnless { it.isBlank() || it == WifiManager.UNKNOWN_SSID }
+            .takeUnless { it.isBlank() || it == "<unknown ssid>" }
 
         private fun String.validBssid(): String? =
             takeUnless { it.isBlank() || it == "02:00:00:00:00:00" }

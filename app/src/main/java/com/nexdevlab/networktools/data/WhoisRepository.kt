@@ -50,7 +50,12 @@ class WhoisRepository {
                 if (registrarServer != null && registrarServer != authoritativeServer) {
                     runCatching { queryWhois(registrarServer, query) }
                         .onSuccess { responses += ServerResponse(registrarServer, it) }
+                    coroutineContext.ensureActive()
                 }
+            } else {
+                runCatching { queryWhois(CymruWhoisServer, " -v $query") }
+                    .onSuccess { responses += ServerResponse(CymruWhoisServer, it) }
+                coroutineContext.ensureActive()
             }
         }
 
@@ -116,6 +121,7 @@ class WhoisRepository {
 
     companion object {
         private const val IanaWhoisServer = "whois.iana.org"
+        private const val CymruWhoisServer = "whois.cymru.com"
         private const val WhoisPort = 43
         private const val ConnectTimeoutMillis = 5_000
         private const val ReadTimeoutMillis = 7_000
@@ -168,13 +174,12 @@ class WhoisRepository {
             require(responses.isNotEmpty())
             val responseBodies = responses.asReversed().map(ServerResponse::body)
             fun firstValue(vararg keys: String): String? {
-                val wanted = keys.map(::normalizeKey).toSet()
+                val wanted = keys.map(::normalizeKey)
                 responseBodies.forEach { body ->
-                    body.lineSequence().forEach { line ->
-                        val pair = keyValue(line) ?: return@forEach
-                        if (normalizeKey(pair.first) in wanted && pair.second.isNotBlank()) {
-                            return pair.second
-                        }
+                    val values = body.lineSequence().mapNotNull(::keyValue).toList()
+                    wanted.forEach { key ->
+                        values.firstOrNull { normalizeKey(it.first) == key && it.second.isNotBlank() }
+                            ?.let { return it.second }
                     }
                 }
                 return null
@@ -225,7 +230,8 @@ class WhoisRepository {
                 } else {
                     null
                 },
-                autonomousSystem = firstValue("OriginAS", "Origin", "Aut-num"),
+                autonomousSystem = firstValue("OriginAS", "Origin", "Aut-num")
+                    ?: parseCymruAsn(responseBodies),
                 rawResponse = raw,
             )
         }
@@ -248,6 +254,14 @@ class WhoisRepository {
                 ?.second
                 ?.takeIf(String::isNotBlank)
         }
+
+        private fun parseCymruAsn(responses: List<String>): String? = responses.asSequence()
+            .flatMap(String::lineSequence)
+            .map { it.trim() }
+            .filter { '|' in it }
+            .map { it.substringBefore('|').trim().substringBefore(' ') }
+            .firstOrNull { value -> value.isNotEmpty() && value.all(Char::isDigit) }
+            ?.let { "AS$it" }
 
         private fun keyValue(line: String): Pair<String, String>? {
             val clean = line.trim()
@@ -280,7 +294,7 @@ class WhoisRepository {
             return looksLikeIpv4(value)
         }
 
-        private fun isPublicAddress(address: InetAddress): Boolean {
+        internal fun isPublicAddress(address: InetAddress): Boolean {
             if (
                 address.isAnyLocalAddress || address.isLoopbackAddress || address.isLinkLocalAddress ||
                 address.isSiteLocalAddress || address.isMulticastAddress
