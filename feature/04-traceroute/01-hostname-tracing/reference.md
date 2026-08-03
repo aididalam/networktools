@@ -4,6 +4,12 @@
 
 The Traceroute screen collects hostname tracing while probing successive hop limits toward the validated target. Results are emitted in hop order, and missing responses remain visible as timed-out hops so the route is not misleading.
 
+## Google Play Policy Requirements
+
+- Run tracing only after an explicit user action against the displayed, validated target and show an authorized-use notice. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Bound maximum hops, attempts per hop, timeout, concurrency, and retry behavior; do not add stealth, evasion, exploitation, or continuous background tracing.
+- Show timeouts and partial routes honestly and stop all network work when the user cancels or leaves the active trace.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The Traceroute screen collects hostname tracing while probing successive hop lim
 
 - [ ] Run Hostname Tracing against controlled reachable, closed, and unreachable targets and verify emitted results match packet captures or the test server.
 - [ ] Test cancellation, timeout, duplicate responses, out-of-order responses, partial discovery, and permission denial; verify final state and counts remain correct.
+
+- [ ] Submit excessive hop, retry, timeout, and rapid-repeat requests; verify hard limits apply and no trace begins without an explicit visible start action.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The Traceroute screen collects hostname tracing while probing successive hop lim
 
 - [ ] Verify Hostname Tracing validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Capture traffic during start, cancel, navigation, and process backgrounding; verify packets target only the displayed destination, remain within limits, and stop when the active trace ends.
 
 ### 6. Accessibility Testing
 

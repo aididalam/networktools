@@ -4,6 +4,12 @@
 
 The user can share the currently available log entries through Android's Sharesheet. The app builds a readable plain-text payload, excludes unavailable fields, and does not send anything until the user chooses a destination.
 
+## Google Play Policy Requirements
+
+- Logging must be explicitly enabled by the user, visibly indicated, and limited to connectivity metadata observable by NetworkTools; do not use VpnService, packet capture, package usage, or other-app monitoring.
+- Store entries only in app-private local storage, provide clear/delete/export controls, and never send logs to analytics, advertising, or remote storage.
+- Do not run hidden persistent surveillance; stop callbacks when logging is disabled and accurately disclose any user-visible foreground execution. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The user can share the currently available log entries through Android's Sharesh
 
 - [ ] With a known Connections Log result, invoke Share Log Entries and verify the Android Sharesheet receives the expected MIME type, subject, and plain-text payload.
 - [ ] Cancel the Sharesheet and test with no compatible target; verify no result is lost and no automatic transmission occurs.
+
+- [ ] Verify logging is off by default, starts and stops only through the visible control, does not reconstruct pre-install history, and records no events after the user disables it.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The user can share the currently available log entries through Android's Sharesh
 
 - [ ] Verify Share Log Entries validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Inspect permissions, services, packets, logs, analytics, and stored rows; verify there is no VpnService, packet content, app inventory, hidden background service, or remote log transmission.
 
 ### 6. Accessibility Testing
 

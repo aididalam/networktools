@@ -4,6 +4,12 @@
 
 Local-network Wake-on-LAN sends the selected device's magic packet through the active Wi-Fi or Ethernet interface to the configured subnet broadcast address. The app validates that the destination is suitable for local delivery and reports when no usable local route exists.
 
+## Google Play Policy Requirements
+
+- Send a magic packet only after an explicit user action to a displayed, user-saved or user-entered device that the user is authorized to manage. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Validate MAC, destination, broadcast scope, and UDP port; rate-limit repeated sends and never run scheduled, hidden, relayed, or background Wake-on-LAN jobs.
+- Keep saved device identifiers in app-private local storage and transmit only the standard magic packet to the confirmed destination.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ Local-network Wake-on-LAN sends the selected device's magic packet through the a
 
 - [ ] On a controlled LAN, capture the UDP datagram and verify it is sent through the active local interface to the configured broadcast address and port.
 - [ ] Test no local network, mobile-only connectivity, invalid subnet data, socket failure, and route changes; verify sending is blocked or fails with an accurate reason.
+
+- [ ] Test missing confirmation, malformed targets, public destinations, rapid repeated taps, app backgrounding, and cancellation; verify validation and rate limits prevent unintended packet sends.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ Local-network Wake-on-LAN sends the selected device's magic packet through the a
 
 - [ ] Verify Local Network Wake-on-LAN validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 
 ### 6. Accessibility Testing
 

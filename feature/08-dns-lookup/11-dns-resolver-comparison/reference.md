@@ -4,6 +4,12 @@
 
 The DNS Lookup screen performs DNS resolver comparison for the validated name through the selected resolver. The response is parsed into structured records with resolver and TTL context, while NXDOMAIN, timeout, and malformed responses receive distinct error states.
 
+## Google Play Policy Requirements
+
+- Execute only user-initiated, bounded DNS questions for the displayed name and selected resolver. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Validate names, record types, resolver addresses, message sizes, retry counts, and timeouts; do not implement amplification, spoofing, reflection, bulk enumeration, or background querying.
+- Respect active Private DNS behavior and clearly identify when a custom resolver changes the normal protected resolution path.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The DNS Lookup screen performs DNS resolver comparison for the validated name th
 
 - [ ] Use a controlled resolver or response fixture with known DNS Resolver Comparison data and verify query construction, parsing, normalization, and displayed output.
 - [ ] Test malformed input, no-record responses, referral or multiple-answer responses, timeout, truncated data, and server failure; verify distinct outcomes.
+
+- [ ] Submit oversized names, excessive retries, rapid repeated queries, invalid custom resolvers, and bulk-style input; verify bounded single-target behavior and no automatic enumeration.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The DNS Lookup screen performs DNS resolver comparison for the validated name th
 
 - [ ] Verify DNS Resolver Comparison validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Capture DNS traffic and malformed responses; verify requests use the displayed resolver and record type, reject amplification-oriented payloads, avoid leaking unrelated names, and stop after the active lookup.
 
 ### 6. Accessibility Testing
 

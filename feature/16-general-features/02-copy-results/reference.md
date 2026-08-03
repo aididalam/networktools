@@ -4,6 +4,12 @@
 
 The user can copy the currently available results from the General Features screen to the system clipboard. The action is enabled only when content exists and confirms completion without changing the result.
 
+## Google Play Policy Requirements
+
+- Copy or share only after an explicit user action and preview the exact eligible payload. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+- Exclude unavailable, permission-protected, secret, credential, internal-debug, and undisclosed metadata fields.
+- Never copy or share automatically after a lookup, scan, calculation, refresh, interruption, or background event.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The user can copy the currently available results from the General Features scre
 
 - [ ] With a known General Features result, invoke Copy Results and verify the clipboard text exactly matches the visible eligible fields and formatting.
 - [ ] Verify the action is disabled or explains the empty state when no result exists, and that repeated copies do not mutate the source data.
+
+- [ ] Verify no clipboard write or Sharesheet launch occurs without pressing the visible action, and confirm excluded and unavailable fields never enter the payload.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The user can copy the currently available results from the General Features scre
 
 - [ ] Verify Copy Results validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Inspect clipboard, intents, temporary files, logs, and lifecycle callbacks; verify payload creation is explicit, minimal, and not repeated after configuration or process recreation.
 
 ### 6. Accessibility Testing
 

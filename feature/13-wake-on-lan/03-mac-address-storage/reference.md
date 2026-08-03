@@ -4,6 +4,12 @@
 
 The Wake-on-LAN screen uses MAC address storage as part of a saved device profile or packet destination. Values are validated, stored in app-private local storage when applicable, and remain editable before a packet is sent.
 
+## Google Play Policy Requirements
+
+- Send a magic packet only after an explicit user action to a displayed, user-saved or user-entered device that the user is authorized to manage. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Validate MAC, destination, broadcast scope, and UDP port; rate-limit repeated sends and never run scheduled, hidden, relayed, or background Wake-on-LAN jobs.
+- Keep saved device identifiers in app-private local storage and transmit only the standard magic packet to the confirmed destination.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The Wake-on-LAN screen uses MAC address storage as part of a saved device profil
 
 - [ ] Create data for MAC Address Storage, close and relaunch the app, and verify the expected records and ordering persist without duplication.
 - [ ] Exercise empty storage, maximum supported records, update, and removal flows; verify storage failures do not corrupt existing data.
+
+- [ ] Test missing confirmation, malformed targets, public destinations, rapid repeated taps, app backgrounding, and cancellation; verify validation and rate limits prevent unintended packet sends.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The Wake-on-LAN screen uses MAC address storage as part of a saved device profil
 
 - [ ] Verify MAC Address Storage validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 
 ### 6. Accessibility Testing
 

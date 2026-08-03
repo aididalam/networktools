@@ -4,6 +4,12 @@
 
 During a Ping run, the app derives ICMP ping from the selected ICMP or TCP probe and updates the result summary as responses arrive. Timeouts and unsupported probe methods are reported explicitly without fabricating response data.
 
+## Google Play Policy Requirements
+
+- Start probes only after an explicit user action against the displayed target and show an authorized-use notice. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Enforce conservative packet-count, packet-size, timeout, interval, and concurrency limits; do not implement flood, stealth, evasion, or background probing.
+- Cancel sockets and jobs when stopped or when the active workflow ends, and never expand a hostname into scans of neighboring addresses.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ During a Ping run, the app derives ICMP ping from the selected ICMP or TCP probe
 
 - [ ] Run ICMP Ping against controlled reachable, closed, and unreachable targets and verify emitted results match packet captures or the test server.
 - [ ] Test cancellation, timeout, duplicate responses, out-of-order responses, partial discovery, and permission denial; verify final state and counts remain correct.
+
+- [ ] Try zero, negative, excessive, rapid, repeated, and concurrent probe settings; verify validation and hard limits prevent flooding and no probe starts without pressing the visible start action.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ During a Ping run, the app derives ICMP ping from the selected ICMP or TCP probe
 
 - [ ] Verify ICMP Ping validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Use packet capture and lifecycle tests to verify traffic is limited to the displayed target and configured bounded method, stops on cancellation, and never continues as a hidden background task.
 
 ### 6. Accessibility Testing
 

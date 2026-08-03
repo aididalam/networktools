@@ -4,6 +4,12 @@
 
 Manual IP Address Entry is implemented as shared behavior across applicable NetworkTools screens, with consistent validation, state handling, and feedback. Tools opt into the behavior through the same reusable UI and data contracts.
 
+## Google Play Policy Requirements
+
+- Validate and display detected or entered network parameters without starting probes, scans, navigation, or packet sends until the user invokes the relevant explicit action. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Reject malformed, oversized, public-range where disallowed, ambiguous, control-character, and injection-oriented input before it reaches network or intent APIs.
+- Do not persist manual targets by default or send them to analytics, advertising, crash reports, or unrelated services.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ Manual IP Address Entry is implemented as shared behavior across applicable Netw
 
 - [ ] Apply valid boundary and representative values for Manual IP Address Entry; verify the next General Features operation uses the exact normalized setting.
 - [ ] Submit empty, malformed, out-of-range, duplicate, and unsupported values; verify execution is blocked with a field-specific error.
+
+- [ ] Enter malformed, oversized, control-character, public-range, and rapidly changed values; verify validation is deterministic and no network operation starts automatically.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ Manual IP Address Entry is implemented as shared behavior across applicable Netw
 
 - [ ] Verify Manual IP Address Entry validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Trace input through storage, logs, analytics, intents, DNS, and sockets; verify unconfirmed values never trigger external behavior or undisclosed persistence.
 
 ### 6. Accessibility Testing
 

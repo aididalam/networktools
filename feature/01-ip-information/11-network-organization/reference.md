@@ -4,6 +4,12 @@
 
 After obtaining the public IP address, the app selects the authoritative Regional Internet Registry through the public IANA RDAP bootstrap registry and reads the registered network organization from its keyless HTTPS RDAP response. Missing or redacted entities are shown as unavailable.
 
+## Google Play Policy Requirements
+
+- Collect network information only while the user is viewing this feature or explicitly requests refresh; do not run hidden background monitoring.
+- Request only the minimum Wi-Fi or location permission required for the selected value, immediately before use, and keep unaffected values usable after denial. Follow the [Permissions and Sensitive APIs policy](https://support.google.com/googleplay/android-developer/answer/16909972).
+- Keep SSID, BSSID, addresses, and lookup results on-device except for the minimum keyless request needed to resolve public IP, RDAP, or ASN data and an explicit user-initiated share. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ After obtaining the public IP address, the app selects the authoritative Regiona
 
 - [ ] Use controlled IANA bootstrap and RDAP fixtures and verify the correct registry is selected and the registered network organization is parsed exactly.
 - [ ] Test unallocated, private, reserved, redirected, rate-limited, malformed, and redacted RDAP responses; verify the documented unavailable state.
+
+- [ ] Verify opening unrelated tools does not request Wi-Fi or location permission, permission denial leaves unrestricted network values available, and refresh never continues after leaving the screen.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ After obtaining the public IP address, the app selects the authoritative Regiona
 
 - [ ] Verify Network Organization validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Capture network, analytics, logs, and local storage during use; verify protected Wi-Fi identifiers and results are not transmitted or recorded beyond the documented keyless lookup and explicit share actions.
 
 ### 6. Accessibility Testing
 

@@ -4,6 +4,12 @@
 
 Built-in help provides locally available, tool-specific guidance, input requirements, permission explanations, and common error recovery steps. Help opens from the relevant tool and returns the user to the same state.
 
+## Google Play Policy Requirements
+
+- Include clear authorized-use guidance for Ping, Traceroute, LAN scanning, port scanning, router access, Terminal, and Wake-on-LAN. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Explain sensitive permissions immediately before the associated feature requests them and document denial, revocation, and data-handling behavior.
+- Keep help packaged and available offline so policy guidance cannot disappear because a remote page changes or becomes unavailable.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ Built-in help provides locally available, tool-specific guidance, input requirem
 
 - [ ] Open help from each supported tool and verify the correct topic, prerequisites, examples, permissions, and error guidance are shown.
 - [ ] Verify help works offline, internal links reach valid topics, and Back returns to the originating tool with its state intact.
+
+- [ ] Verify every sensitive or dual-use tool links to the correct authorization, permission, privacy, limits, and recovery guidance before its first operation.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ Built-in help provides locally available, tool-specific guidance, input requirem
 
 - [ ] Verify Built In Help Topics validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Inspect packaged help and all external links; verify policy guidance is offline, current for the release, HTTPS-only where linked, and cannot be replaced by downloaded executable content.
 
 ### 6. Accessibility Testing
 

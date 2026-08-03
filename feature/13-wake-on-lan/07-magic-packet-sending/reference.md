@@ -4,6 +4,12 @@
 
 The Wake-on-LAN tool builds a standards-compliant magic packet from the selected device's MAC address and sends it to the configured broadcast or target address and UDP port. Sending occurs only after validation and reports local socket or routing errors.
 
+## Google Play Policy Requirements
+
+- Send a magic packet only after an explicit user action to a displayed, user-saved or user-entered device that the user is authorized to manage. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Validate MAC, destination, broadcast scope, and UDP port; rate-limit repeated sends and never run scheduled, hidden, relayed, or background Wake-on-LAN jobs.
+- Keep saved device identifiers in app-private local storage and transmit only the standard magic packet to the confirmed destination.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The Wake-on-LAN tool builds a standards-compliant magic packet from the selected
 
 - [ ] Capture a sent packet and verify it contains six `FF` bytes followed by exactly 16 repetitions of the selected six-byte MAC address.
 - [ ] Test malformed MAC addresses, invalid destinations and ports, unavailable routes, socket failures, and repeated sends; verify no packet is sent until validation succeeds.
+
+- [ ] Test missing confirmation, malformed targets, public destinations, rapid repeated taps, app backgrounding, and cancellation; verify validation and rate limits prevent unintended packet sends.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The Wake-on-LAN tool builds a standards-compliant magic packet from the selected
 
 - [ ] Verify Magic Packet Sending validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 
 ### 6. Accessibility Testing
 

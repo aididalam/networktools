@@ -4,6 +4,12 @@
 
 The IP Finder validates the domain and resolves its A and AAAA records using Android's active DNS configuration or a user-selected DNS server. Resolution uses standard DNS directly and requires no API account or key.
 
+## Google Play Policy Requirements
+
+- Use only keyless public-IP echo, standard DNS, IANA bootstrap, and authoritative RDAP/DNS-to-ASN lookups; do not add paid/keyed enrichment or hidden location/privacy profiling.
+- Run lookups only after an explicit user action, apply conservative rate limits, and do not provide bulk IP or domain enumeration. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Do not store or send targets and results to analytics, advertising, or unrelated services; disclose the minimum keyless endpoint processing in the privacy policy. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The IP Finder validates the domain and resolves its A and AAAA records using And
 
 - [ ] Use a controlled resolver or response fixture with known Domain To IP Resolution data and verify query construction, parsing, normalization, and displayed output.
 - [ ] Test malformed input, no-record responses, referral or multiple-answer responses, timeout, truncated data, and server failure; verify distinct outcomes.
+
+- [ ] Attempt bulk, wildcard, multi-line, rapid-repeat, and geolocation/privacy-enrichment requests; verify only one bounded keyless lookup runs and removed intelligence fields are never requested or shown.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The IP Finder validates the domain and resolves its A and AAAA records using And
 
 - [ ] Verify Domain To IP Resolution validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Capture all network calls and inspect configuration; verify only documented keyless DNS, IANA, RDAP, ASN, and public-IP endpoints are contacted and no secret or runtime API key exists.
 
 ### 6. Accessibility Testing
 

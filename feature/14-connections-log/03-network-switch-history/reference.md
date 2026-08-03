@@ -4,6 +4,12 @@
 
 The Connections Log records network switch history from observable Android connectivity callbacks with a timestamp and normalized network type. Duplicate transient callbacks are coalesced, entries remain local, and unavailable platform details are not inferred.
 
+## Google Play Policy Requirements
+
+- Logging must be explicitly enabled by the user, visibly indicated, and limited to connectivity metadata observable by NetworkTools; do not use VpnService, packet capture, package usage, or other-app monitoring.
+- Store entries only in app-private local storage, provide clear/delete/export controls, and never send logs to analytics, advertising, or remote storage.
+- Do not run hidden persistent surveillance; stop callbacks when logging is disabled and accurately disclose any user-visible foreground execution. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The Connections Log records network switch history from observable Android conne
 
 - [ ] Create data for Network Switch History, close and relaunch the app, and verify the expected records and ordering persist without duplication.
 - [ ] Exercise empty storage, maximum supported records, update, and removal flows; verify storage failures do not corrupt existing data.
+
+- [ ] Verify logging is off by default, starts and stops only through the visible control, does not reconstruct pre-install history, and records no events after the user disables it.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The Connections Log records network switch history from observable Android conne
 
 - [ ] Verify Network Switch History validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Inspect permissions, services, packets, logs, analytics, and stored rows; verify there is no VpnService, packet content, app inventory, hidden background service, or remote log transmission.
 
 ### 6. Accessibility Testing
 

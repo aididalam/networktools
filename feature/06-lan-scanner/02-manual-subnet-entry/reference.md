@@ -4,6 +4,12 @@
 
 The LAN Scanner applies manual subnet entry within the validated local subnet and merges matching responses into a single device record. Discovery is bounded by the selected scan mode, can be cancelled, and labels values as unknown when a protocol does not supply them.
 
+## Google Play Policy Requirements
+
+- Default scanning to the active private LAN only, require explicit user start and authorization acknowledgement, and reject public internet ranges or oversized subnets. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Enforce conservative host, protocol, timeout, retry, and concurrency limits; stop immediately on cancellation or when the active scan ends.
+- Limit behavior to discovery and identification; do not add exploitation, credential guessing, vulnerability bypass, stealth, persistence, or hidden background scanning.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The LAN Scanner applies manual subnet entry within the validated local subnet an
 
 - [ ] Apply valid boundary and representative values for Manual Subnet Entry; verify the next LAN Scanner operation uses the exact normalized setting.
 - [ ] Submit empty, malformed, out-of-range, duplicate, and unsupported values; verify execution is blocked with a field-specific error.
+
+- [ ] Test public ranges, oversized CIDRs, rapid restart, excessive concurrency, and missing authorization acknowledgement; verify scanning is blocked until a valid private subnet and explicit start are present.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The LAN Scanner applies manual subnet entry within the validated local subnet an
 
 - [ ] Verify Manual Subnet Entry validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Capture scan traffic and lifecycle state; verify packets stay inside the displayed private subnet, remain rate-limited, contain no exploit or credential attempts, and stop after cancellation.
 
 ### 6. Accessibility Testing
 

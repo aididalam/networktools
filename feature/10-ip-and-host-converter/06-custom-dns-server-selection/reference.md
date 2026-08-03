@@ -4,6 +4,12 @@
 
 The IP and Host Converter performs custom DNS server selection after validating the hostname or address. DNS work runs off the main thread, preserves multiple valid answers, and distinguishes no-record, malformed-input, and resolver-failure states.
 
+## Google Play Policy Requirements
+
+- Run hostname and reverse-DNS operations only after an explicit user action for one validated target; do not provide bulk enumeration. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Bound answer count, resolver requests, retries, timeout, input length, and custom resolver behavior; stop all work when the active conversion ends.
+- Do not persist or transmit entered hosts, addresses, or DNS answers to analytics, advertising, or unrelated services. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The IP and Host Converter performs custom DNS server selection after validating 
 
 - [ ] Apply valid boundary and representative values for Custom DNS Server Selection; verify the next IP And Host Converter operation uses the exact normalized setting.
 - [ ] Submit empty, malformed, out-of-range, duplicate, and unsupported values; verify execution is blocked with a field-specific error.
+
+- [ ] Try wildcard, multi-line, oversized, rapid-repeat, and bulk-style inputs; verify one bounded target is processed per explicit action and work stops after cancellation.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The IP and Host Converter performs custom DNS server selection after validating 
 
 - [ ] Verify Custom DNS Server Selection validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Inspect DNS traffic, logs, analytics, cache, and lifecycle behavior; verify only the displayed target reaches the selected resolver and no lookup continues in the background.
 
 ### 6. Accessibility Testing
 

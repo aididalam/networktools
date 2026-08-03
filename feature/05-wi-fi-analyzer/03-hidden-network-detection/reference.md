@@ -4,6 +4,12 @@
 
 The Wi-Fi Analyzer uses Android's permitted scan results to calculate and present hidden network detection. Scans run asynchronously, clearly distinguish stale and current data, and explain when location, nearby-device, Wi-Fi, or platform restrictions prevent access.
 
+## Google Play Policy Requirements
+
+- Perform Wi-Fi scans only in a visible, user-initiated workflow, comply with platform scan throttling, and do not request background location. Follow the [Permissions and Sensitive APIs policy](https://support.google.com/googleplay/android-developer/answer/16909972).
+- Present a just-in-time permission explanation, support denial and revocation, and never block unrelated tools because scan permission is unavailable.
+- Keep SSIDs, BSSIDs, saved-network details, and scan results on-device; do not upload them, derive precise location, or send them to analytics or advertising. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The Wi-Fi Analyzer uses Android's permitted scan results to calculate and presen
 
 - [ ] Feed scan fixtures with null, empty, whitespace-only, escaped, and normal SSIDs; verify only truly unavailable names are classified as hidden.
 - [ ] Feed multiple hidden BSSIDs and later reveal an SSID for one BSSID; verify records stay distinct and the updated network is no longer labeled hidden.
+
+- [ ] Verify no scan or permission prompt occurs before the user enters Wi-Fi Analyzer and starts scanning; test denial, revocation, throttling, Wi-Fi disabled, and leaving the screen.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The Wi-Fi Analyzer uses Android's permitted scan results to calculate and presen
 
 - [ ] Feed malformed, oversized, duplicated, and rapidly changing scan-result fields; verify parsing is bounded and cannot crash or corrupt the network list.
 - [ ] Verify least-privilege Wi-Fi and location permissions and confirm SSIDs, BSSIDs, saved-network details, and scan results are not written to production logs, analytics, or remote services.
+
+- [ ] Inspect manifest permissions, network calls, logs, analytics, and storage; verify there is no background-location request or upload of SSIDs, BSSIDs, saved-network details, or scan results.
 
 ### 6. Accessibility Testing
 

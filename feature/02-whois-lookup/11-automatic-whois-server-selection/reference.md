@@ -4,6 +4,12 @@
 
 The WHOIS Lookup screen uses automatic WHOIS server selection to determine which WHOIS service receives the validated domain or IP query. The selected server is shown before execution, and an unreachable or unsupported server produces a recoverable error.
 
+## Google Play Policy Requirements
+
+- Run only an explicit, user-initiated lookup for one validated domain or IP target at a time; do not provide bulk harvesting or automated enumeration. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Respect authoritative RDAP/WHOIS rate limits, referrals, terms, redaction, and retry guidance; do not bypass registry controls or claim unavailable registrant data.
+- Treat registrant and contact fields as sensitive: do not send them to analytics, advertising, or remote storage, and expose copy/share only as explicit user actions. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The WHOIS Lookup screen uses automatic WHOIS server selection to determine which
 
 - [ ] Apply valid boundary and representative values for Automatic WHOIS Server Selection; verify the next WHOIS Lookup operation uses the exact normalized setting.
 - [ ] Submit empty, malformed, out-of-range, duplicate, and unsupported values; verify execution is blocked with a field-specific error.
+
+- [ ] Attempt rapid, repeated, wildcard, and bulk-style submissions; verify the app validates a single target, applies client-side rate limits, and never starts an automatic enumeration job.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The WHOIS Lookup screen uses automatic WHOIS server selection to determine which
 
 - [ ] Verify Automatic WHOIS Server Selection validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Inspect logs, analytics, cache, clipboard, and network calls; verify registrant data is retained only for the visible result or explicit user action and no registry-control bypass is attempted.
 
 ### 6. Accessibility Testing
 

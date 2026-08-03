@@ -4,6 +4,12 @@
 
 The Ping screen exposes configurable packet interval as a validated setting applied to the next probe run. Unsafe or unsupported values are rejected inline and the chosen value remains visible while the run is active.
 
+## Google Play Policy Requirements
+
+- Start probes only after an explicit user action against the displayed target and show an authorized-use notice. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Enforce conservative packet-count, packet-size, timeout, interval, and concurrency limits; do not implement flood, stealth, evasion, or background probing.
+- Cancel sockets and jobs when stopped or when the active workflow ends, and never expand a hostname into scans of neighboring addresses.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The Ping screen exposes configurable packet interval as a validated setting appl
 
 - [ ] Apply valid boundary and representative values for Configurable Packet Interval; verify the next Ping operation uses the exact normalized setting.
 - [ ] Submit empty, malformed, out-of-range, duplicate, and unsupported values; verify execution is blocked with a field-specific error.
+
+- [ ] Try zero, negative, excessive, rapid, repeated, and concurrent probe settings; verify validation and hard limits prevent flooding and no probe starts without pressing the visible start action.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The Ping screen exposes configurable packet interval as a validated setting appl
 
 - [ ] Verify Configurable Packet Interval validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Use packet capture and lifecycle tests to verify traffic is limited to the displayed target and configured bounded method, stops on cancellation, and never continues as a hidden background task.
 
 ### 6. Accessibility Testing
 

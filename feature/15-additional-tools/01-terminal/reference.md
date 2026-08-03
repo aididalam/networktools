@@ -2,19 +2,27 @@
 
 ## Feature: How will it work?
 
-Selecting Terminal launches the corresponding supported in-app surface or Android destination. Availability is checked before launch, and a clear fallback is shown when the destination does not exist on the device.
+Terminal opens an in-app diagnostic console backed by packaged, allowlisted network operations such as DNS lookup, bounded Ping, and interface inspection. It does not expose Android's system shell; each command and argument is parsed by NetworkTools, executed with app-level privileges, and can be cancelled.
+
+## Google Play Policy Requirements
+
+- Provide only packaged, allowlisted diagnostic commands inside the app sandbox; do not expose root, arbitrary system shell, exploitation, credential attacks, package installation, or security bypass. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Do not download scripts, binaries, DEX, JAR, native libraries, command definitions, or executable updates from outside Google Play.
+- Require explicit execution, validate and bound every argument, show command scope, and stop commands when the user cancels or leaves the active session.
 
 ## Test Cases
 
 ### 1. UI/UX Testing
 
-- [ ] Verify the Terminal action uses a recognizable icon or clear command label, has an appropriate enabled or disabled state, and gives immediate feedback.
-- [ ] Trigger success, unavailable, and failure states; verify messages are concise, anchored to the action, and do not obscure existing results.
+- [ ] Verify the command chooser, bounded argument input, run and stop actions, progress, output, and error states are clear and remain stable while output changes.
+- [ ] Verify long output, multiple result lines, invalid arguments, disabled commands, cancellation, and empty history remain readable without resembling unrestricted shell access.
 
 ### 2. Functional Testing
 
-- [ ] Invoke Terminal with a supported destination and verify the exact in-app route, Android settings screen, browser URI, or external intent is opened.
-- [ ] Repeat with no handler, invalid destination, restricted profile, and failed launch; verify a recoverable message and unchanged source-screen state.
+- [ ] Execute every packaged command with controlled inputs and verify it invokes the corresponding internal NetworkTools operation with identical validation, limits, cancellation, and output.
+- [ ] Submit unknown commands, unsupported flags, malformed arguments, and unavailable operations; verify execution is rejected with a recoverable message and no process is spawned.
+
+- [ ] Try unlisted commands, shell metacharacters, pipes, redirection, command substitution, oversized arguments, package operations, root commands, and rapid execution; verify all are rejected.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ Selecting Terminal launches the corresponding supported in-app surface or Androi
 
 - [ ] Verify Terminal validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Inspect the APK, runtime downloads, process creation, files, and network calls; verify only packaged allowlisted diagnostics execute with app privileges and no dynamic executable code is loaded.
 
 ### 6. Accessibility Testing
 

@@ -4,6 +4,12 @@
 
 Tool Result History is implemented as shared behavior across applicable NetworkTools screens, with consistent validation, state handling, and feedback. Tools opt into the behavior through the same reusable UI and data contracts.
 
+## Google Play Policy Requirements
+
+- Keep history in app-private local storage, make retention visible, and provide a clear deletion action. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+- Do not place targets or results in analytics, advertising, crash reports, cloud backup, or remote storage.
+- Exclude sensitive or permission-protected fields unless the user explicitly enables history for the relevant tool.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ Tool Result History is implemented as shared behavior across applicable NetworkT
 
 - [ ] Create data for Tool Result History, close and relaunch the app, and verify the expected records and ordering persist without duplication.
 - [ ] Exercise empty storage, maximum supported records, update, and removal flows; verify storage failures do not corrupt existing data.
+
+- [ ] Verify history retention is local, deletion is immediate and complete, disabled history stores nothing, and reinstall or cleared app data does not restore records unexpectedly.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ Tool Result History is implemented as shared behavior across applicable NetworkT
 
 - [ ] Verify Tool Result History validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Inspect databases, backups, logs, analytics, and network traffic; verify tool targets and results exist only in documented app-private history.
 
 ### 6. Accessibility Testing
 

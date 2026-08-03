@@ -4,6 +4,12 @@
 
 The Router Setup screen uses Wi-Fi settings access to open the detected or manually validated router address through the appropriate Android intent. The destination is shown before launch and unsupported, unsafe, or unreachable destinations are handled without a crash.
 
+## Google Play Policy Requirements
+
+- Require explicit confirmation of the displayed router address before launching it and never attempt automatic configuration, credential submission, default-password testing, or authentication bypass. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Open administration pages through a safe Android browser intent; prefer HTTPS and show a clear warning before user-approved HTTP access.
+- Never collect, inspect, store, autofill, or transmit router usernames, passwords, cookies, page content, or configuration data.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The Router Setup screen uses Wi-Fi settings access to open the detected or manua
 
 - [ ] Invoke Wi-Fi Settings Access with a supported destination and verify the exact in-app route, Android settings screen, browser URI, or external intent is opened.
 - [ ] Repeat with no handler, invalid destination, restricted profile, and failed launch; verify a recoverable message and unchanged source-screen state.
+
+- [ ] Test detected, manual, malformed, public, redirected, HTTP, HTTPS, and unreachable addresses; verify the exact destination is shown and requires user confirmation before launch.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The Router Setup screen uses Wi-Fi settings access to open the detected or manua
 
 - [ ] Verify Wi-Fi Settings Access validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Inspect intents, WebView usage, logs, storage, and network traffic; verify no credentials, default-password attempts, JavaScript bridge, automatic setting change, or unconfirmed navigation occurs.
 
 ### 6. Accessibility Testing
 

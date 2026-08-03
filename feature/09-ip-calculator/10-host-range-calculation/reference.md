@@ -4,6 +4,12 @@
 
 The IP Calculator derives host range calculation locally from validated IPv4 or IPv6 input and prefix information. Recalculation is deterministic, uses address-family-correct arithmetic, and shows inline errors for invalid or incompatible values.
 
+## Google Play Policy Requirements
+
+- Perform all calculations locally and deterministically without internet access, device identifiers, location, account data, or sensitive runtime permissions.
+- Do not transmit calculator inputs or results to analytics, advertising, crash messages, or remote storage. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+- Use only packaged calculation code and data; do not download executable logic or silently change calculation rules outside a Play-distributed update.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The IP Calculator derives host range calculation locally from validated IPv4 or 
 
 - [ ] Run published IPv4 and IPv6 test vectors for Host Range Calculation and compare every result against independently calculated expected values.
 - [ ] Test prefix boundaries, zero and maximum addresses, malformed notation, mixed address families, and overflow conditions; verify deterministic validation.
+
+- [ ] Disable connectivity and deny all optional permissions; verify every supported calculation, validation path, copy action, and history decision still works locally.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The IP Calculator derives host range calculation locally from validated IPv4 or 
 
 - [ ] Verify Host Range Calculation validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Inspect manifest permissions, network traffic, logs, analytics, and storage while calculating; verify inputs and results never leave the documented on-device workflow.
 
 ### 6. Accessibility Testing
 

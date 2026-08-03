@@ -4,6 +4,12 @@
 
 Selecting Web Tools launches the corresponding supported in-app surface or Android destination. Availability is checked before launch, and a clear fallback is shown when the destination does not exist on the device.
 
+## Google Play Policy Requirements
+
+- Open only documented HTTPS destinations through the external browser or a tightly allowlisted safe surface; do not load arbitrary HTTP or untrusted content with a JavaScript bridge. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Show the destination domain before leaving the app, validate redirects and intents, and provide a safe failure when no handler exists.
+- Do not append network identifiers, results, clipboard data, or personal data to URLs unless the user explicitly chooses a documented share action. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ Selecting Web Tools launches the corresponding supported in-app surface or Andro
 
 - [ ] Invoke Web Tools with a supported destination and verify the exact in-app route, Android settings screen, browser URI, or external intent is opened.
 - [ ] Repeat with no handler, invalid destination, restricted profile, and failed launch; verify a recoverable message and unchanged source-screen state.
+
+- [ ] Test HTTP, HTTPS, malformed, redirecting, deep-link, intent, no-handler, and unallowlisted destinations; verify only approved HTTPS navigation proceeds after user action.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ Selecting Web Tools launches the corresponding supported in-app surface or Andro
 
 - [ ] Verify Web Tools validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Inspect WebView settings, intents, URLs, headers, logs, and redirects; verify there is no JavaScript bridge for untrusted content and no undisclosed data is appended or transmitted.
 
 ### 6. Accessibility Testing
 

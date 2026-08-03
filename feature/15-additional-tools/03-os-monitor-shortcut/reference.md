@@ -4,6 +4,12 @@
 
 Selecting OS Monitor Shortcut launches the corresponding supported in-app surface or Android destination. Availability is checked before launch, and a clear fallback is shown when the destination does not exist on the device.
 
+## Google Play Policy Requirements
+
+- Launch OS Monitor through a targeted package or documented Android settings intent only; do not request broad installed-app visibility. Follow the [Package Visibility policy](https://support.google.com/googleplay/android-developer/answer/10158779).
+- Do not install, download, update, or recommend APKs outside Google Play, and do not treat absence of the destination app as an error requiring broad package discovery.
+- Show the destination before launch and provide a safe fallback when the exact package or intent handler is unavailable.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ Selecting OS Monitor Shortcut launches the corresponding supported in-app surfac
 
 - [ ] Invoke OS Monitor Shortcut with a supported destination and verify the exact in-app route, Android settings screen, browser URI, or external intent is opened.
 - [ ] Repeat with no handler, invalid destination, restricted profile, and failed launch; verify a recoverable message and unchanged source-screen state.
+
+- [ ] Test the exact destination installed, absent, disabled, incompatible, and without an intent handler; verify targeted resolution and a safe fallback without scanning installed apps.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ Selecting OS Monitor Shortcut launches the corresponding supported in-app surfac
 
 - [ ] Verify OS Monitor Shortcut validates and bounds all host, address, port, subnet, resolver, URI, and provider data before network use or intent launch; malformed data must not cause injection or unsafe routing.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Inspect the manifest and runtime package queries; verify `QUERY_ALL_PACKAGES`, package installation, external APK download, and broad app-inventory collection are absent.
 
 ### 6. Accessibility Testing
 

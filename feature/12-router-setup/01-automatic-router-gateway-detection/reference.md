@@ -4,6 +4,12 @@
 
 The Router Setup screen uses automatic router gateway detection to establish the router destination for later administration actions. Automatically detected and manually supplied values remain distinguishable and are validated before use.
 
+## Google Play Policy Requirements
+
+- Require explicit confirmation of the displayed router address before launching it and never attempt automatic configuration, credential submission, default-password testing, or authentication bypass. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Open administration pages through a safe Android browser intent; prefer HTTPS and show a clear warning before user-approved HTTP access.
+- Never collect, inspect, store, autofill, or transmit router usernames, passwords, cookies, page content, or configuration data.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The Router Setup screen uses automatic router gateway detection to establish the
 
 - [ ] Provide controlled platform or provider data for Automatic Router Gateway Detection and verify the Router Setup screen displays the exact normalized expected value.
 - [ ] Verify unavailable permissions, invalid or absent data, timeout, and provider or platform errors produce the documented fallback without stale or fabricated automatic router gateway detection data.
+
+- [ ] Test detected, manual, malformed, public, redirected, HTTP, HTTPS, and unreachable addresses; verify the exact destination is shown and requires user confirmation before launch.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The Router Setup screen uses automatic router gateway detection to establish the
 
 - [ ] Verify Automatic Router Gateway Detection validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Inspect intents, WebView usage, logs, storage, and network traffic; verify no credentials, default-password attempts, JavaScript bridge, automatic setting change, or unconfirmed navigation occurs.
 
 ### 6. Accessibility Testing
 

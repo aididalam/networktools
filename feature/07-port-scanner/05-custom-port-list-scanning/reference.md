@@ -4,6 +4,12 @@
 
 The Port Scanner applies custom port list scanning to a validated target and bounded port set using timed TCP connection attempts. It reports confirmed results only, distinguishes closed ports from timeouts when possible, and supports cancellation.
 
+## Google Play Policy Requirements
+
+- Scan only a single displayed host supplied or confirmed by the user, require an authorized-use acknowledgement, and start only from an explicit action. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Bound the port count, range, custom list, timeout, retries, and concurrency; reject duplicate, malformed, oversized, or automation-style requests.
+- Detect connection state and common services only; do not implement exploitation, banner attacks, authentication attempts, evasion, stealth, or background scanning.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The Port Scanner applies custom port list scanning to a validated target and bou
 
 - [ ] Apply valid boundary and representative values for Custom Port List Scanning; verify the next Port Scanner operation uses the exact normalized setting.
 - [ ] Submit empty, malformed, out-of-range, duplicate, and unsupported values; verify execution is blocked with a field-specific error.
+
+- [ ] Test excessive ranges, duplicate lists, invalid ports, rapid restart, missing authorization acknowledgement, and concurrent scans; verify hard limits and explicit start requirements.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The Port Scanner applies custom port list scanning to a validated target and bou
 
 - [ ] Verify Custom Port List Scanning validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Capture traffic for success, timeout, cancel, navigation, and backgrounding; verify connections go only to the displayed host and ports, contain no exploit or credential payloads, and terminate promptly.
 
 ### 6. Accessibility Testing
 

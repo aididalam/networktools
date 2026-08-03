@@ -4,6 +4,12 @@
 
 Remote Wake-on-LAN sends a magic packet to a user-configured public host or relay and UDP port after explaining that router forwarding or a compatible relay is required. Remote destinations are explicit, validated, and never inferred from approximate device-location data.
 
+## Google Play Policy Requirements
+
+- Send a magic packet only after an explicit user action to a displayed, user-saved or user-entered device that the user is authorized to manage. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Validate MAC, destination, broadcast scope, and UDP port; rate-limit repeated sends and never run scheduled, hidden, relayed, or background Wake-on-LAN jobs.
+- Keep saved device identifiers in app-private local storage and transmit only the standard magic packet to the confirmed destination.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ Remote Wake-on-LAN sends a magic packet to a user-configured public host or rela
 
 - [ ] Send through a controlled public endpoint or relay and verify the received datagram, resolved destination, UDP port, and magic-packet bytes are correct.
 - [ ] Test DNS failure, unreachable target, blocked port, IPv4 and IPv6 destinations, relay rejection, and timeout; verify the app reports packet-send status without claiming the device woke.
+
+- [ ] Test missing confirmation, malformed targets, public destinations, rapid repeated taps, app backgrounding, and cancellation; verify validation and rate limits prevent unintended packet sends.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ Remote Wake-on-LAN sends a magic packet to a user-configured public host or rela
 
 - [ ] Verify Remote Wake-on-LAN Support validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Capture traffic, logs, analytics, and storage; verify only a standard magic packet reaches the displayed destination and saved MAC/IP data is not uploaded or exposed.
 
 ### 6. Accessibility Testing
 

@@ -4,6 +4,12 @@
 
 The stop action cancels the active Ping operation, prevents additional results from being appended, and retains the results already received. The screen then returns to a state where the user can start a new operation.
 
+## Google Play Policy Requirements
+
+- Start probes only after an explicit user action against the displayed target and show an authorized-use notice. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
+- Enforce conservative packet-count, packet-size, timeout, interval, and concurrency limits; do not implement flood, stealth, evasion, or background probing.
+- Cancel sockets and jobs when stopped or when the active workflow ends, and never expand a hostname into scans of neighboring addresses.
+
 ## Test Cases
 
 ### 1. UI/UX Testing
@@ -15,6 +21,8 @@ The stop action cancels the active Ping operation, prevents additional results f
 
 - [ ] Start a multi-step Ping operation, invoke Stop Active Ping, and verify active jobs and sockets are cancelled and no later callback appends results.
 - [ ] Invoke stop before start, during startup, and after completion; verify idempotent behavior and immediate ability to run again.
+
+- [ ] Try zero, negative, excessive, rapid, repeated, and concurrent probe settings; verify validation and hard limits prevent flooding and no probe starts without pressing the visible start action.
 
 ### 3. Compatibility Testing
 
@@ -30,6 +38,8 @@ The stop action cancels the active Ping operation, prevents additional results f
 
 - [ ] Verify Stop Active Ping validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
 - [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+- [ ] Use packet capture and lifecycle tests to verify traffic is limited to the displayed target and configured bounded method, stops on cancellation, and never continues as a hidden background task.
 
 ### 6. Accessibility Testing
 
