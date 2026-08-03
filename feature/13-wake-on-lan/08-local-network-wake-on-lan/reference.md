@@ -1,0 +1,42 @@
+# Local Network Wake-on-LAN
+
+## Feature: How will it work?
+
+Local-network Wake-on-LAN sends the selected device's magic packet through the active Wi-Fi or Ethernet interface to the configured subnet broadcast address. The app validates that the destination is suitable for local delivery and reports when no usable local route exists.
+
+## Test Cases
+
+### 1. UI/UX Testing
+
+- [ ] Verify the local send action shows the selected device, active local network, broadcast address, and UDP port before sending.
+- [ ] Verify unavailable Wi-Fi or Ethernet, invalid broadcast addresses, sending, success, and failure states are visually distinct and actionable.
+
+### 2. Functional Testing
+
+- [ ] On a controlled LAN, capture the UDP datagram and verify it is sent through the active local interface to the configured broadcast address and port.
+- [ ] Test no local network, mobile-only connectivity, invalid subnet data, socket failure, and route changes; verify sending is blocked or fails with an accurate reason.
+
+### 3. Compatibility Testing
+
+- [ ] Verify Local Network Wake-on-LAN on the minimum supported Android API, the target API, and the latest available API across representative Pixel and non-Pixel devices.
+- [ ] Verify behavior on Wi-Fi, mobile data, VPN, IPv4-only, IPv6-only, dual-stack, offline, and platform-restricted configurations where the feature applies.
+
+### 4. Performance Testing
+
+- [ ] Measure opening and using Local Network Wake-on-LAN; verify work stays off the main thread where needed and UI frames remain responsive within the product performance budget.
+- [ ] Repeat the workflow at least 20 times and monitor memory, CPU, battery, sockets, and coroutine or callback counts; verify resources return to baseline after completion or cancellation.
+
+### 5. Security Testing
+
+- [ ] Verify Local Network Wake-on-LAN validates untrusted input and persisted values, rejects oversized or malformed data, and fails without exposing internal exceptions.
+- [ ] Verify least-privilege permissions, encrypted HTTPS for remote providers, app-private storage where applicable, and no sensitive network identifiers or results in production logs, analytics, or crash messages.
+
+### 6. Accessibility Testing
+
+- [ ] With TalkBack enabled, verify Local Network Wake-on-LAN controls, values, units, states, errors, and progress have meaningful labels and a logical traversal order.
+- [ ] Verify keyboard or switch access, minimum touch targets, visible focus, color contrast, dark and light themes, and 200% font or display scaling without clipped content.
+
+### 7. Interruption Testing
+
+- [ ] During Local Network Wake-on-LAN, rotate, resize, background and foreground the app, lock and unlock the device, and trigger process recreation; verify committed state is restored and transient actions are not repeated.
+- [ ] Interrupt with Wi-Fi or mobile switching, VPN changes, airplane mode, permission revocation, and network loss or recovery where applicable; verify cancellation, retry, and final status remain accurate.
