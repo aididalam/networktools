@@ -152,6 +152,11 @@ fun NetworkToolsApp() {
                     themeChoice = themeChoice,
                     onThemeChoice = updateThemeChoice,
                 )
+                "connections-log" -> ConnectionsLogScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
                 else -> HomeScreen(
                     themeChoice = themeChoice,
                     onThemeChoice = updateThemeChoice,

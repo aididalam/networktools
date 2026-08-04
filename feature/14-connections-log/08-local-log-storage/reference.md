@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The Connections Log records local log storage from observable Android connectivity callbacks with a timestamp and normalized network type. Duplicate transient callbacks are coalesced, entries remain local, and unavailable platform details are not inferred.
+Up to 100 validated entries are retained newest-first in app-private SharedPreferences. The store rejects malformed rows, is excluded from cloud backup and device transfer, offers an explicit clear action, and never records SSID, BSSID, IP address, SIM data, or packet contents.
 
 ## Google Play Policy Requirements
 
@@ -22,7 +22,7 @@ The Connections Log records local log storage from observable Android connectivi
 - [ ] Create data for Local Log Storage, close and relaunch the app, and verify the expected records and ordering persist without duplication.
 - [ ] Exercise empty storage, maximum supported records, update, and removal flows; verify storage failures do not corrupt existing data.
 
-- [ ] Verify logging is off by default, starts and stops only through the visible control, does not reconstruct pre-install history, and records no events after the user disables it.
+- [ ] Verify opening the visible Connections Log screen establishes a fresh baseline, closing it unregisters monitoring, and no event is inferred or recorded while the screen is closed.
 
 ### 3. Compatibility Testing
 

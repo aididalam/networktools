@@ -22,7 +22,7 @@ The Connections Log records Wi-Fi connection history from observable Android con
 - [ ] Create data for Wi-Fi Connection History, close and relaunch the app, and verify the expected records and ordering persist without duplication.
 - [ ] Exercise empty storage, maximum supported records, update, and removal flows; verify storage failures do not corrupt existing data.
 
-- [ ] Verify logging is off by default, starts and stops only through the visible control, does not reconstruct pre-install history, and records no events after the user disables it.
+- [ ] Verify opening the visible Connections Log screen establishes a fresh baseline, closing it unregisters monitoring, and no event is inferred or recorded while the screen is closed.
 
 ### 3. Compatibility Testing
 

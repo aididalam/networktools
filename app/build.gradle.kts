@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.dnsjava)
+    implementation(libs.okhttp)
     runtimeOnly(libs.slf4j.nop)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     testImplementation(libs.junit)

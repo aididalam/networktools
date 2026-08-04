@@ -14,6 +14,7 @@ coroutines = "1.10.2"
 dnsjava = "3.6.5"
 slf4j = "1.7.36"
 desugarJdkLibs = "2.1.5"
+okhttp = "4.12.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +38,7 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 dnsjava = { group = "dnsjava", name = "dnsjava", version.ref = "dnsjava" }
 slf4j-nop = { group = "org.slf4j", name = "slf4j-nop", version.ref = "slf4j" }
 desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibs" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

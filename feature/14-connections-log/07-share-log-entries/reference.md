@@ -22,7 +22,7 @@ The user can share the currently available log entries through Android's Sharesh
 - [ ] With a known Connections Log result, invoke Share Log Entries and verify the Android Sharesheet receives the expected MIME type, subject, and plain-text payload.
 - [ ] Cancel the Sharesheet and test with no compatible target; verify no result is lost and no automatic transmission occurs.
 
-- [ ] Verify logging is off by default, starts and stops only through the visible control, does not reconstruct pre-install history, and records no events after the user disables it.
+- [ ] Verify opening the visible Connections Log screen establishes a fresh baseline, closing it unregisters monitoring, and no event is inferred or recorded while the screen is closed.
 
 ### 3. Compatibility Testing
 

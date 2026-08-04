@@ -7,7 +7,6 @@ import androidx.compose.material.icons.outlined.Cable
 import androidx.compose.material.icons.outlined.CellTower
 import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Hub
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Lan
 import androidx.compose.material.icons.outlined.PowerSettingsNew
@@ -16,7 +15,6 @@ import androidx.compose.material.icons.outlined.Radar
 import androidx.compose.material.icons.outlined.Route
 import androidx.compose.material.icons.outlined.Router
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -43,7 +41,5 @@ val ToolCategories = listOf(
     ToolCategory("11", "ip-finder", "IP Finder", Icons.Outlined.Cable, Color(0xFF2C8273), true),
     ToolCategory("12", "router-setup", "Router Setup", Icons.Outlined.Router, Color(0xFFAA6C18), true),
     ToolCategory("13", "wake-on-lan", "Wake-on-LAN", Icons.Outlined.PowerSettingsNew, Color(0xFFB64D4D), true),
-    ToolCategory("14", "connections-log", "Connections Log", Icons.Outlined.History, Color(0xFF4F739E)),
-    ToolCategory("15", "additional-tools", "Additional Tools", Icons.Outlined.Terminal, Color(0xFF64746D)),
-    ToolCategory("16", "general", "General Features", Icons.Outlined.Hub, Color(0xFF805C87)),
+    ToolCategory("14", "connections-log", "Connections Log", Icons.Outlined.History, Color(0xFF4F739E), true),
 )

@@ -22,7 +22,7 @@ The user can copy the currently available log entries from the Connections Log s
 - [ ] With a known Connections Log result, invoke Copy Log Entries and verify the clipboard text exactly matches the visible eligible fields and formatting.
 - [ ] Verify the action is disabled or explains the empty state when no result exists, and that repeated copies do not mutate the source data.
 
-- [ ] Verify logging is off by default, starts and stops only through the visible control, does not reconstruct pre-install history, and records no events after the user disables it.
+- [ ] Verify opening the visible Connections Log screen establishes a fresh baseline, closing it unregisters monitoring, and no event is inferred or recorded while the screen is closed.
 
 ### 3. Compatibility Testing
 
