@@ -59,6 +59,27 @@ class WifiSavedNetworkStore(context: Context) {
         }.sortedByDescending(SavedWifiNetwork::lastSeenMillis))
     }
 
+    fun recordConnected(accessPoints: List<WifiAccessPoint>): List<SavedWifiNetwork> {
+        val connected = accessPoints.firstOrNull(WifiAccessPoint::connected) ?: return load()
+        val current = load()
+        val now = System.currentTimeMillis()
+        val existing = current.firstOrNull { it.bssid.equals(connected.bssid, ignoreCase = true) }
+        val observed = SavedWifiNetwork(
+            bssid = connected.bssid,
+            ssid = connected.ssid.take(MaximumSsidLength),
+            hidden = connected.hidden,
+            security = connected.security.take(MaximumSecurityLength),
+            band = connected.band,
+            channel = connected.channel,
+            firstSavedMillis = existing?.firstSavedMillis ?: now,
+            lastSeenMillis = connected.lastSeenMillis.coerceAtMost(now),
+        )
+        return save(
+            (listOf(observed) + current.filterNot { it.bssid.equals(connected.bssid, ignoreCase = true) })
+                .take(MaximumEntries),
+        )
+    }
+
     fun remove(bssid: String): List<SavedWifiNetwork> =
         save(load().filterNot { it.bssid.equals(bssid, ignoreCase = true) })
 

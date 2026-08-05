@@ -35,8 +35,11 @@ class WifiAnalyzerScreenTest {
         composeRule.onNodeWithText("Channels").performClick()
         composeRule.onNodeWithText("Ready to scan").assertIsDisplayed()
         composeRule.onNodeWithText("Saved").performClick()
-        composeRule.onNodeWithText("Saved in NetworkTools").assertIsDisplayed()
-        composeRule.onNodeWithText("Network identity only; Wi-Fi passwords are never accessed or stored.")
+        composeRule.onNodeWithText("Open Android saved networks").assertIsDisplayed()
+        composeRule.onNodeWithText("Observed in NetworkTools").assertIsDisplayed()
+        composeRule.onNodeWithText(
+            "Connected networks are recorded when scanned. Android Settings owns the complete saved list, passwords, and QR sharing.",
+        )
             .assertIsDisplayed()
     }
 
@@ -53,6 +56,18 @@ class WifiAnalyzerScreenTest {
             composeRule.onNodeWithText("Not now").performClick()
             composeRule.onNodeWithText("Ready to scan").assertIsDisplayed()
         }
+    }
+
+    @Test
+    fun savedNetworksRequireConsentBeforeOpeningAndroidSettings() {
+        openWifiAnalyzer()
+        composeRule.onNodeWithText("Saved").performClick()
+        composeRule.onNodeWithText("Open Android saved networks").performClick()
+
+        composeRule.onNodeWithText("Open Android Wi-Fi sharing?").assertIsDisplayed()
+        composeRule.onNodeWithText("Open Wi-Fi settings").assertIsDisplayed()
+        composeRule.onNodeWithText("Cancel").performClick()
+        composeRule.onNodeWithText("Observed in NetworkTools").assertIsDisplayed()
     }
 
     private fun openWifiAnalyzer() {

@@ -24,6 +24,12 @@ class WifiAnalyzerRepository(private val context: Context) {
     private val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
     private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
+    fun connectedLanTarget(): WifiLanTarget? = runCatching {
+        LanScannerRepository(context).detectNetwork().let { network ->
+            WifiLanTarget(localAddress = network.localAddress, subnet = network.subnet.display)
+        }
+    }.getOrNull()
+
     @Suppress("DEPRECATION")
     @SuppressLint("MissingPermission")
     suspend fun scan(savedBssids: Set<String>): WifiScanSnapshot {

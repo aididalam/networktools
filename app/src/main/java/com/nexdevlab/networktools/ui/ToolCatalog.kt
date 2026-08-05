@@ -15,6 +15,7 @@ import androidx.compose.material.icons.outlined.Radar
 import androidx.compose.material.icons.outlined.Route
 import androidx.compose.material.icons.outlined.Router
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -42,4 +43,5 @@ val ToolCategories = listOf(
     ToolCategory("12", "router-setup", "Router Setup", Icons.Outlined.Router, Color(0xFFAA6C18), true),
     ToolCategory("13", "wake-on-lan", "Wake-on-LAN", Icons.Outlined.PowerSettingsNew, Color(0xFFB64D4D), true),
     ToolCategory("14", "connections-log", "Connections Log", Icons.Outlined.History, Color(0xFF4F739E), true),
+    ToolCategory("15", "internet-speed-meter", "Internet Speed Meter", Icons.Outlined.Speed, Color(0xFF168178), true),
 )

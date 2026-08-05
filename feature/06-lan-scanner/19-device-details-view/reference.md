@@ -2,7 +2,7 @@
 
 ## Feature: How will it work?
 
-The LAN Scanner applies device details view within the validated local subnet and merges matching responses into a single device record. Discovery is bounded by the selected scan mode, can be cancelled, and labels values as unknown when a protocol does not supply them.
+The expanded device view shows normalized identity evidence, discovery protocols, advertised services, and open common TCP ports found by a Deep scan. Each port is paired with a conservative likely-service label based on the port number; supported web ports offer an explicit external-browser action.
 
 ## Google Play Policy Requirements
 

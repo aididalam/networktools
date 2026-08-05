@@ -2,13 +2,15 @@
 
 ## Feature: How will it work?
 
-The Wi-Fi Analyzer uses Android's permitted scan results to calculate and present saved Wi-Fi networks. Scans run asynchronously, clearly distinguish stale and current data, and explain when location, nearby-device, Wi-Fi, or platform restrictions prevent access.
+After a user-initiated scan, Wi-Fi Analyzer automatically records the identity metadata of the access point Android identifies as currently connected. Users may also bookmark visible access points. This local list contains only observations made while NetworkTools is used and is not presented as the device's complete Wi-Fi history. The Saved tab links to Android Wi-Fi Settings for the OS-owned complete saved-network list and protected QR/password sharing.
 
 ## Google Play Policy Requirements
 
 - Perform Wi-Fi scans only in a visible, user-initiated workflow, comply with platform scan throttling, and do not request background location. Follow the [Permissions and Sensitive APIs policy](https://support.google.com/googleplay/android-developer/answer/16909972).
 - Present a just-in-time permission explanation, support denial and revocation, and never block unrelated tools because scan permission is unavailable.
 - Keep SSIDs, BSSIDs, saved-network details, and scan results on-device; do not upload them, derive precise location, or send them to analytics or advertising. Follow the [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
+- Do not claim that a runtime permission grants saved-network credential access. For apps targeting Android 10 or later, `WifiManager.getConfiguredNetworks()` returns an empty list except for privileged device-owner, profile-owner, system, or carrier cases.
+- Delegate saved credential and QR display to Android Wi-Fi Settings after an explicit explanation. NetworkTools must never read, generate from, persist, log, or receive a saved Wi-Fi password.
 
 ## Test Cases
 
@@ -21,6 +23,8 @@ The Wi-Fi Analyzer uses Android's permitted scan results to calculate and presen
 
 - [ ] Create data for Saved Wi-Fi Networks, close and relaunch the app, and verify the expected records and ordering persist without duplication.
 - [ ] Exercise empty storage, maximum supported records, update, and removal flows; verify storage failures do not corrupt existing data.
+- [ ] Scan while connected and verify that access point is added or updated once; verify unconnected results are not automatically recorded.
+- [ ] Open Android saved networks, cancel the consent dialog, then continue and verify Android Wi-Fi Settings opens without returning credentials to NetworkTools.
 
 - [ ] Verify no scan or permission prompt occurs before the user enters Wi-Fi Analyzer and starts scanning; test denial, revocation, throttling, Wi-Fi disabled, and leaving the screen.
 
@@ -38,6 +42,7 @@ The Wi-Fi Analyzer uses Android's permitted scan results to calculate and presen
 
 - [ ] Feed malformed, oversized, duplicated, and rapidly changing scan-result fields; verify parsing is bounded and cannot crash or corrupt the network list.
 - [ ] Verify least-privilege Wi-Fi and location permissions and confirm SSIDs, BSSIDs, saved-network details, and scan results are not written to production logs, analytics, or remote services.
+- [ ] Verify the app never calls configured-network credential APIs, never persists passwords or QR credentials, and cannot leave for system sharing until the user confirms.
 
 - [ ] Inspect manifest permissions, network calls, logs, analytics, and storage; verify there is no background-location request or upload of SSIDs, BSSIDs, saved-network details, or scan results.
 

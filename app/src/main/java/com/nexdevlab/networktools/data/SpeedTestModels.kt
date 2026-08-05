@@ -3,19 +3,53 @@ package com.nexdevlab.networktools.data
 import java.util.Locale
 import kotlin.math.abs
 
-enum class SpeedServerChoice(val label: String, val countryCode: String?) {
-    AUTOMATIC("Automatic", null),
-    BANGLADESH("Bangladesh", "BD"),
-    INDIA("India", "IN"),
-    SINGAPORE("Singapore", "SG"),
-    JAPAN("Japan", "JP"),
-    AUSTRALIA("Australia", "AU"),
-    GERMANY("Germany", "DE"),
-    NETHERLANDS("Netherlands", "NL"),
-    UNITED_KINGDOM("United Kingdom", "GB"),
-    UNITED_STATES("United States", "US"),
-    BRAZIL("Brazil", "BR"),
+enum class SpeedServerMode { LOCAL, AUTOMATIC, COUNTRY }
+
+data class SpeedServerChoice(
+    val label: String,
+    val countryCode: String?,
+    val mode: SpeedServerMode,
+) {
+    companion object {
+        val LOCAL = SpeedServerChoice("Local / nearest edge", null, SpeedServerMode.LOCAL)
+        val AUTOMATIC = SpeedServerChoice("Automatic (global)", null, SpeedServerMode.AUTOMATIC)
+
+        fun all(displayLocale: Locale = Locale.getDefault()): List<SpeedServerChoice> = listOf(LOCAL, AUTOMATIC) +
+            Locale.getISOCountries()
+                .asSequence()
+                .map { it.uppercase(Locale.ROOT) }
+                .distinct()
+                .map { code ->
+                    val name = Locale.Builder().setRegion(code).build().getDisplayCountry(displayLocale).ifBlank { code }
+                    SpeedServerChoice(name, code, SpeedServerMode.COUNTRY)
+                }
+                .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.label })
+                .toList()
+    }
 }
+
+data class SpeedEndpointChoice(
+    val label: String,
+    val machine: String?,
+    val city: String = "",
+    val countryCode: String = "",
+) {
+    companion object {
+        val AUTOMATIC = SpeedEndpointChoice("Automatic (lowest latency)", null)
+    }
+}
+
+internal fun speedEndpointChoices(servers: List<SpeedTestServer>): List<SpeedEndpointChoice> =
+    listOf(SpeedEndpointChoice.AUTOMATIC) + servers
+        .distinctBy(SpeedTestServer::machine)
+        .mapIndexed { index, server ->
+            SpeedEndpointChoice(
+                label = "${server.city.ifBlank { server.countryCode.ifBlank { "Available" } }} · Server ${index + 1}",
+                machine = server.machine,
+                city = server.city,
+                countryCode = server.countryCode,
+            )
+        }
 
 enum class SpeedTestPhase(val label: String) {
     IDLE("Ready"),
@@ -30,12 +64,13 @@ data class SpeedTestServer(
     val machine: String,
     val city: String,
     val countryCode: String,
+    internal val endpointHost: String,
     internal val downloadUrl: String,
     internal val uploadUrl: String,
 ) {
     val displayLocation: String
         get() = listOf(city, countryCode).filter(String::isNotBlank).joinToString(", ")
-            .ifBlank { "M-Lab server" }
+            .ifBlank { "Test server" }
 }
 
 data class SpeedProgress(
@@ -65,15 +100,21 @@ data class SpeedTestResult(
         add("Jitter: ${jitterMillis?.let(::formatMilliseconds) ?: "Unavailable"}")
         add("Server: ${listOf(serverCity, serverCountryCode).filter(String::isNotBlank).joinToString(", ")}")
         add("Network: $networkType")
-        add("Provider: Measurement Lab (M-Lab) NDT7")
     }.joinToString("\n")
 }
 
 data class SpeedTestUiState(
     val running: Boolean = false,
     val phase: SpeedTestPhase = SpeedTestPhase.IDLE,
-    val selectedServer: SpeedServerChoice = SpeedServerChoice.AUTOMATIC,
+    val selectedServer: SpeedServerChoice = SpeedServerChoice.LOCAL,
+    val selectedEndpoint: SpeedEndpointChoice = SpeedEndpointChoice.AUTOMATIC,
+    val serverOptions: List<SpeedEndpointChoice> = listOf(SpeedEndpointChoice.AUTOMATIC),
+    val serversLoading: Boolean = false,
+    val serverOptionsError: String? = null,
+    val regionalServerFallback: Boolean = false,
     val activeServer: SpeedTestServer? = null,
+    val localCountryCode: String = "",
+    val localEdgeName: String = "",
     val networkType: String = "Checking network",
     val metered: Boolean = false,
     val liveMbps: Double = 0.0,

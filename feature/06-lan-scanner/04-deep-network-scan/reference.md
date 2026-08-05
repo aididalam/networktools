@@ -2,12 +2,13 @@
 
 ## Feature: How will it work?
 
-The LAN Scanner applies deep network scan within the validated local subnet and merges matching responses into a single device record. Discovery is bounded by the selected scan mode, can be cancelled, and labels values as unknown when a protocol does not supply them.
+The LAN Scanner applies deep discovery within the validated local subnet, then checks a bounded list of common TCP ports on discovered devices. It merges responses into one device record, labels service names as port-based estimates, can be cancelled, and does not perform banner grabbing, authentication, exploitation, or vulnerability testing.
 
 ## Google Play Policy Requirements
 
 - Default scanning to the active private LAN only, require explicit user start and authorization acknowledgement, and reject public internet ranges or oversized subnets. Follow the [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
 - Enforce conservative host, protocol, timeout, retry, and concurrency limits; stop immediately on cancellation or when the active scan ends.
+- Open only discovered HTTP/HTTPS services, only after a user tap, and hand the validated private IPv4 URL to an external browser rather than embedding untrusted content.
 - Limit behavior to discovery and identification; do not add exploitation, credential guessing, vulnerability bypass, stealth, persistence, or hidden background scanning.
 - Request Nearby Devices only just before an Android 16 local-network operation when local-network protection applies; when targeting Android 17 or higher, migrate this gate to `ACCESS_LOCAL_NETWORK` and preserve denial and revocation handling.
 - Treat IP addresses, hostnames, MAC addresses, and service advertisements as sensitive local data: keep them on-device, exclude history from backup and device transfer, and do not send them to analytics or remote providers.
@@ -22,6 +23,8 @@ The LAN Scanner applies deep network scan within the validated local subnet and 
 ### 2. Functional Testing
 
 - [ ] Run Deep Network Scan against controlled reachable, closed, and unreachable targets and verify emitted results match packet captures or the test server.
+- [ ] Expose controlled common TCP ports and verify open ports appear with the correct likely-service label while closed and filtered ports do not appear.
+- [ ] Verify only supported discovered HTTP/HTTPS ports show an Open action and the launched URL retains the scanned private address and port.
 - [ ] Test cancellation, timeout, duplicate responses, out-of-order responses, partial discovery, and permission denial; verify final state and counts remain correct.
 
 - [ ] Test public ranges, oversized CIDRs, rapid restart, excessive concurrency, and missing authorization acknowledgement; verify scanning is blocked until a valid private subnet and explicit start are present.

@@ -79,6 +79,21 @@ data class SavedWifiNetwork(
     val channel: Int,
     val firstSavedMillis: Long,
     val lastSeenMillis: Long,
+) {
+    fun asPlainText(): String = buildList {
+        add("Saved Wi-Fi network")
+        add("Name: $ssid")
+        add("BSSID: $bssid")
+        add("Security: $security")
+        add("Band: ${band.label}")
+        add("Channel: $channel")
+        add("Password: Not available to NetworkTools")
+    }.joinToString("\n")
+}
+
+data class WifiLanTarget(
+    val localAddress: String,
+    val subnet: String,
 )
 
 enum class WifiAnalyzerView(val label: String) {
@@ -92,5 +107,6 @@ data class WifiAnalyzerUiState(
     val snapshot: WifiScanSnapshot? = null,
     val savedNetworks: List<SavedWifiNetwork> = emptyList(),
     val comparisonBssids: Set<String> = emptySet(),
+    val connectedLanTarget: WifiLanTarget? = null,
     val error: String? = null,
 )

@@ -2,13 +2,13 @@
 
 ## Feature: How will it work?
 
-NetworkTools will run the NDT7 download phase over the signed WSS endpoint using synthetic measurement traffic. It will calculate Mbps from application payload bytes and monotonic elapsed time, update a bounded live value, and report a final result only when sufficient samples were received.
+NetworkTools will measure download throughput with synthetic traffic on the selected provider. Local / nearest uses bounded, progressively larger HTTPS payloads and a 90th-percentile result; remote research servers use NDT7 over a signed WSS endpoint. Each edge payload gets up to three bounded attempts. After at least one non-warm-up sample succeeds, failure of a later larger payload ends the phase and calculates from valid samples instead of discarding the test. Retry bytes are removed from live progress.
 
 ## Backend, Privacy, And Release Requirements
 
 - The planned provider is M-Lab NDT7 through [Locate API v2](https://www.measurementlab.net/develop/locate-v2/). M-Lab's [developer guidance](https://www.measurementlab.net/develop/) currently says NDT needs no developer API key, but NetworkTools must not ship a paid key, paid API, hardcoded server, token bypass, or unapproved public test endpoint.
-- M-Lab's current [Acceptable Use Policy](https://www.measurementlab.net/aup/) requires informed consent and a published privacy policy, limits interactive users to 40 tests per day, publishes measurement data including the client public IP, and may require commercial integrations to contribute or later register/pay. Release is blocked until NetworkTools has a live privacy-policy URL and the individual developer confirms written zero-cost eligibility for the intended monetization model.
-- Country requests must follow M-Lab's documented ISO country query and signed URLs. If strict country service is unavailable, show Unavailable; do not route to an undisclosed country, scrape server maps, or bypass Locate load balancing.
+- M-Lab's current [developer guidance](https://www.measurementlab.net/develop/) permits commercial and closed-source integrations without an API key. Its [Acceptable Use Policy](https://www.measurementlab.net/aup/) requires informed consent and a published privacy policy, limits interactive users to 40 tests per day, and publishes measurement data including the client public IP. Release remains blocked until NetworkTools has a live privacy-policy URL.
+- Country requests must follow M-Lab's documented ISO country query and signed URLs. Try `strict=true` first; when no in-country node exists, retry through Locate without strict mode and clearly identify the returned regional server's actual city and country. Never scrape server maps or bypass Locate load balancing.
 - Tests must be foreground, explicitly initiated, rate-limited, cancellable, synthetic-data only, and accurately disclosed under Google Play's [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311) and [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
 - Before each release, recheck provider terms. If an API key, payment, commercial contribution, account contract, or incompatible data practice becomes mandatory, keep the feature disabled rather than silently changing providers.
 
@@ -23,6 +23,7 @@ NetworkTools will run the NDT7 download phase over the signed WSS endpoint using
 
 - [ ] Feed deterministic byte/time samples and verify instantaneous and final Mbps calculations, rounding, zero-time protection, and completion thresholds.
 - [ ] Test slow, fast, stalled, partial, rejected, and disconnected downloads; verify no stale success result and all sockets close.
+- [ ] Force transient failures on larger high-speed payloads; verify three bounded attempts, rollback of partial retry bytes, fallback to valid earlier samples, and no inflated final speed.
 
 ### 3. Compatibility Testing
 

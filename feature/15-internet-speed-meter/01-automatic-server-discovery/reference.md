@@ -2,13 +2,14 @@
 
 ## Feature: How will it work?
 
-Before a user-initiated test, NetworkTools will call M-Lab Locate API v2 over HTTPS for healthy NDT7 candidates near the current network. It will use only complete WSS download and upload URLs returned by Locate, preserve the access token query parameter, try candidates in response order, and fail clearly when none are available.
+Local / nearest is the default. NetworkTools makes a bounded HTTPS probe on the active Android network, reads the returned edge code and client-country code, and tests the provider's automatically routed nearest edge. On a Bangladesh route this currently resolves to the Dhaka (`DAC`) or Chittagong (`CGP`) edge when available. The UI displays the detected edge instead of promising a city before routing is known. The optional global mode still discovers and latency-ranks up to four research-network candidates.
 
 ## Backend, Privacy, And Release Requirements
 
-- The planned provider is M-Lab NDT7 through [Locate API v2](https://www.measurementlab.net/develop/locate-v2/). M-Lab's [developer guidance](https://www.measurementlab.net/develop/) currently says NDT needs no developer API key, but NetworkTools must not ship a paid key, paid API, hardcoded server, token bypass, or unapproved public test endpoint.
-- M-Lab's current [Acceptable Use Policy](https://www.measurementlab.net/aup/) requires informed consent and a published privacy policy, limits interactive users to 40 tests per day, publishes measurement data including the client public IP, and may require commercial integrations to contribute or later register/pay. Release is blocked until NetworkTools has a live privacy-policy URL and the individual developer confirms written zero-cost eligibility for the intended monetization model.
-- Country requests must follow M-Lab's documented ISO country query and signed URLs. If strict country service is unavailable, show Unavailable; do not route to an undisclosed country, scrape server maps, or bypass Locate load balancing.
+- The default path follows Cloudflare's official MIT-licensed [speedtest engine](https://github.com/cloudflare/speedtest) and its documented keyless `speed.cloudflare.com` endpoints. Cloudflare's [global network directory](https://www.cloudflare.com/network/) lists Dhaka and Chittagong. Recheck endpoint terms before every release; do not add an API token, paid API, result-logging call, or unofficial server scrape.
+- Optional remote-country tests use M-Lab NDT7 through [Locate API v2](https://www.measurementlab.net/develop/locate-v2/) and remain release-gated separately.
+- M-Lab's current [developer guidance](https://www.measurementlab.net/develop/) permits commercial and closed-source integrations without an API key. Its [Acceptable Use Policy](https://www.measurementlab.net/aup/) requires informed consent and a published privacy policy, limits interactive users to 40 tests per day, and publishes measurement data including the client public IP. Release remains blocked until NetworkTools has a live privacy-policy URL.
+- Country requests must follow M-Lab's documented ISO country query and signed URLs. Try `strict=true` first; when no in-country node exists, retry through Locate without strict mode and clearly identify the returned regional server's actual city and country. Never scrape server maps or bypass Locate load balancing.
 - Tests must be foreground, explicitly initiated, rate-limited, cancellable, synthetic-data only, and accurately disclosed under Google Play's [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311) and [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
 - Before each release, recheck provider terms. If an API key, payment, commercial contribution, account contract, or incompatible data practice becomes mandatory, keep the feature disabled rather than silently changing providers.
 
@@ -21,7 +22,9 @@ Before a user-initiated test, NetworkTools will call M-Lab Locate API v2 over HT
 
 ### 2. Functional Testing
 
-- [ ] Verify one explicit Start action performs one Locate v2 request and selects the first healthy candidate with both WSS endpoints.
+- [ ] Verify one explicit Start action resolves one nearest edge, displays its bounded edge/country metadata, and sends measurement traffic only to the allowlisted HTTPS host.
+- [ ] From Bangladesh networks, verify normal routing reports `DAC` or `CGP` when those edges are available; if routing selects another edge, display the actual code without claiming a Bangladesh server.
+- [ ] Verify equal-latency and failed probes retain Locate order, all probes are bounded/cancellable, and unavailable probes remain fallback candidates.
 - [ ] Return empty, truncated, malformed, non-HTTPS, expired-token, and multiple-candidate responses; verify strict parsing, ordered fallback, and a recoverable unavailable state.
 
 ### 3. Compatibility Testing

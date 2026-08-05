@@ -51,6 +51,15 @@ class LanScannerRepositoryTest {
     }
 
     @Test
+    fun openPort_exposesOnlyPrivateDiscoveredWebServices() {
+        assertEquals("http://192.168.1.20/", LanOpenPort(80, "HTTP").webUrl("192.168.1.20"))
+        assertEquals("https://10.0.0.5:8443/", LanOpenPort(8443, "Alternate HTTPS").webUrl("10.0.0.5"))
+        assertNull(LanOpenPort(22, "SSH").webUrl("192.168.1.20"))
+        assertNull(LanOpenPort(80, "HTTP").webUrl("8.8.8.8"))
+        assertNull(LanOpenPort(80, "HTTP").webUrl("not-an-address"))
+    }
+
+    @Test
     fun pingParser_distinguishesReplyFromLossAndErrors() {
         assertTrue(LanScannerRepository.parsePingReply("64 bytes from 192.168.1.1: time=2 ms\n1 received"))
         assertFalse(LanScannerRepository.parsePingReply("1 packets transmitted, 0 received, 100% packet loss"))
@@ -146,6 +155,7 @@ class LanScannerRepositoryTest {
                     ipAddress = "192.168.1.1",
                     deviceType = "Router / gateway",
                     protocols = setOf(LanDiscoveryProtocol.ARP, LanDiscoveryProtocol.PING),
+                    openPorts = listOf(LanOpenPort(80, "HTTP")),
                     gateway = true,
                     lastSeenMillis = 1,
                 ),
@@ -158,6 +168,7 @@ class LanScannerRepositoryTest {
         assertTrue(result.contains("Subnet: 192.168.1.0/24"))
         assertTrue(result.contains("Devices: 1"))
         assertTrue(result.contains("Found by: ARP, Ping"))
+        assertTrue(result.contains("80 HTTP"))
     }
 
     private fun netbiosResponse(transactionId: Int, hostname: String, mac: ByteArray): ByteArray {

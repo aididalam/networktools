@@ -2,13 +2,13 @@
 
 ## Feature: How will it work?
 
-Before and after a test, the UI will show the provider, returned city, country, and machine name. If the selected candidate rejects or times out, NetworkTools may try the remaining signed candidates returned by the same Locate response and must update the displayed server to the one that actually measured the connection.
+Before a remote test, the Server selector lists live candidates returned for the chosen country using city and an anonymous sequence number. If no in-country node is available, it lists Locate's nearby regional candidates with an explicit fallback status and their actual countries. Automatic probes the returned candidates and starts with the lowest measured latency; connection failures before data transfer may fall back in ranked order. A specifically selected server is strict: NetworkTools rediscovers a fresh signed endpoint for that machine and asks the user to reselect if it is no longer returned. During and after testing, the UI shows the server actually used without exposing its machine hostname or signed URL.
 
 ## Backend, Privacy, And Release Requirements
 
 - The planned provider is M-Lab NDT7 through [Locate API v2](https://www.measurementlab.net/develop/locate-v2/). M-Lab's [developer guidance](https://www.measurementlab.net/develop/) currently says NDT needs no developer API key, but NetworkTools must not ship a paid key, paid API, hardcoded server, token bypass, or unapproved public test endpoint.
-- M-Lab's current [Acceptable Use Policy](https://www.measurementlab.net/aup/) requires informed consent and a published privacy policy, limits interactive users to 40 tests per day, publishes measurement data including the client public IP, and may require commercial integrations to contribute or later register/pay. Release is blocked until NetworkTools has a live privacy-policy URL and the individual developer confirms written zero-cost eligibility for the intended monetization model.
-- Country requests must follow M-Lab's documented ISO country query and signed URLs. If strict country service is unavailable, show Unavailable; do not route to an undisclosed country, scrape server maps, or bypass Locate load balancing.
+- M-Lab's current [developer guidance](https://www.measurementlab.net/develop/) permits commercial and closed-source integrations without an API key. Its [Acceptable Use Policy](https://www.measurementlab.net/aup/) requires informed consent and a published privacy policy, limits interactive users to 40 tests per day, and publishes measurement data including the client public IP. Release remains blocked until NetworkTools has a live privacy-policy URL.
+- Country requests must follow M-Lab's documented ISO country query and signed URLs. Try `strict=true` first; when no in-country node exists, retry through Locate without strict mode and clearly identify the returned regional server's actual city and country. Never scrape server maps or bypass Locate load balancing.
 - Tests must be foreground, explicitly initiated, rate-limited, cancellable, synthetic-data only, and accurately disclosed under Google Play's [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311) and [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
 - Before each release, recheck provider terms. If an API key, payment, commercial contribution, account contract, or incompatible data practice becomes mandatory, keep the feature disabled rather than silently changing providers.
 
@@ -21,7 +21,8 @@ Before and after a test, the UI will show the provider, returned city, country, 
 
 ### 2. Functional Testing
 
-- [ ] Force the first candidate to reject and verify the next signed candidate is used once, with the final server identity shown accurately.
+- [ ] Verify Automatic orders every candidate by bounded latency and uses the fastest healthy candidate first; force a pre-transfer rejection and verify ranked fallback with the final server shown accurately.
+- [ ] Select a specific candidate and verify no other machine is substituted; if fresh discovery omits it, show a recoverable reselect/Automatic error.
 - [ ] Verify hostnames, city names, country codes, candidate counts, retries, and response sizes are bounded and malformed identity data is not rendered.
 
 ### 3. Compatibility Testing

@@ -12,7 +12,7 @@ class SpeedTestPolicyStore(context: Context) {
 
     fun remainingTests(nowMillis: Long = System.currentTimeMillis()): Int {
         val starts = recentStarts(nowMillis)
-        if (starts.size.toString() != preferences.getString(StartsKey, "")) saveStarts(starts)
+        saveStarts(starts)
         return (MaximumTestsPerDay - starts.size).coerceAtLeast(0)
     }
 
@@ -40,7 +40,7 @@ class SpeedTestPolicyStore(context: Context) {
         const val MaximumTestsPerDay = 20
         private const val ConsentKey = "consent_version"
         private const val StartsKey = "starts"
-        private const val ConsentVersion = 1
+        private const val ConsentVersion = 2
         private const val OneDayMillis = 24L * 60L * 60L * 1_000L
     }
 }

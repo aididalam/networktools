@@ -86,6 +86,7 @@ class LanScanHistoryStore(context: Context) {
         put("type", device.deviceType.take(MaximumTextLength))
         put("protocols", JSONArray(device.protocols.map(Enum<*>::name)))
         put("services", JSONArray(device.services.take(MaximumServices).map { it.take(MaximumTextLength) }))
+        put("openPorts", JSONArray(device.openPorts.take(MaximumOpenPorts).map(LanOpenPort::port)))
         put("self", device.thisDevice)
         put("gateway", device.gateway)
         put("seen", device.lastSeenMillis)
@@ -107,6 +108,13 @@ class LanScanHistoryStore(context: Context) {
                 servicesJson.optString(index).take(MaximumTextLength).takeIf(String::isNotBlank)?.let(::add)
             }
         }
+        val openPortsJson = value.optJSONArray("openPorts") ?: JSONArray()
+        val openPorts = buildList<LanOpenPort> {
+            for (index in 0 until minOf(openPortsJson.length(), MaximumOpenPorts)) {
+                val port = openPortsJson.optInt(index, -1).takeIf { it in 1..65535 } ?: continue
+                if (none { it.port == port }) add(LanOpenPort(port, PortScannerRepository.serviceForPort(port)))
+            }
+        }.sortedBy(LanOpenPort::port)
         return LanDevice(
             ipAddress = LanSubnet.formatIpv4(address),
             hostname = value.optString("hostname").take(MaximumTextLength).takeIf(String::isNotBlank),
@@ -115,6 +123,7 @@ class LanScanHistoryStore(context: Context) {
             deviceType = value.optString("type").take(MaximumTextLength).takeIf(String::isNotBlank) ?: "Unknown device",
             protocols = protocols,
             services = services,
+            openPorts = openPorts,
             thisDevice = value.optBoolean("self"),
             gateway = value.optBoolean("gateway"),
             lastSeenMillis = value.optLong("seen", 0).takeIf { it > 0 } ?: return null,
@@ -128,6 +137,7 @@ class LanScanHistoryStore(context: Context) {
         private const val MaximumDevicesPerEntry = 128
         private const val MaximumScannedHosts = 254
         private const val MaximumServices = 20
+        private const val MaximumOpenPorts = 64
         private const val MaximumTextLength = 160
         private val MacPattern = Regex("^(?:[0-9a-f]{2}:){5}[0-9a-f]{2}$")
     }

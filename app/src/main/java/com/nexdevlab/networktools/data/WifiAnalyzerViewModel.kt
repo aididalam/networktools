@@ -13,7 +13,12 @@ import kotlinx.coroutines.launch
 class WifiAnalyzerViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = WifiAnalyzerRepository(application)
     private val savedStore = WifiSavedNetworkStore(application)
-    private val _state = MutableStateFlow(WifiAnalyzerUiState(savedNetworks = savedStore.load()))
+    private val _state = MutableStateFlow(
+        WifiAnalyzerUiState(
+            savedNetworks = savedStore.load(),
+            connectedLanTarget = repository.connectedLanTarget(),
+        ),
+    )
     val state: StateFlow<WifiAnalyzerUiState> = _state.asStateFlow()
     private var scanJob: Job? = null
     private var lastScanStartedAt = 0L
@@ -31,7 +36,8 @@ class WifiAnalyzerViewModel(application: Application) : AndroidViewModel(applica
             _state.value = _state.value.copy(scanning = true, error = null)
             try {
                 val snapshot = repository.scan(_state.value.savedNetworks.map { it.bssid }.toSet())
-                val saved = savedStore.updateSeen(snapshot.accessPoints)
+                savedStore.updateSeen(snapshot.accessPoints)
+                val saved = savedStore.recordConnected(snapshot.accessPoints)
                 val currentBssids = snapshot.accessPoints.map { it.bssid }.toSet()
                 _state.value = _state.value.copy(
                     scanning = false,
@@ -42,6 +48,7 @@ class WifiAnalyzerViewModel(application: Application) : AndroidViewModel(applica
                     ),
                     savedNetworks = saved,
                     comparisonBssids = _state.value.comparisonBssids.intersect(currentBssids),
+                    connectedLanTarget = repository.connectedLanTarget(),
                 )
             } catch (cancelled: CancellationException) {
                 _state.value = _state.value.copy(scanning = false)

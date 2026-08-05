@@ -52,10 +52,25 @@ class WifiSavedNetworkStoreTest {
         assertEquals(200, updated.lastSeenMillis)
     }
 
+    @Test
+    fun connectedObservationIsRecordedAutomaticallyAndUpdated() {
+        assertTrue(store.recordConnected(listOf(accessPoint())).isEmpty())
+
+        store.recordConnected(listOf(accessPoint(connected = true, lastSeenMillis = 100)))
+        val updated = store.recordConnected(
+            listOf(accessPoint(ssid = "Home renamed", channel = 6, connected = true, lastSeenMillis = 200)),
+        ).single()
+
+        assertEquals("Home renamed", updated.ssid)
+        assertEquals(6, updated.channel)
+        assertEquals(200, updated.lastSeenMillis)
+    }
+
     private fun accessPoint(
         ssid: String = "Test Wi-Fi",
         channel: Int = 1,
         lastSeenMillis: Long = 100,
+        connected: Boolean = false,
     ) = WifiAccessPoint(
         ssid = ssid,
         hidden = false,
@@ -68,5 +83,6 @@ class WifiSavedNetworkStoreTest {
         channelWidth = "20 MHz",
         channelWidthMhz = 20,
         lastSeenMillis = lastSeenMillis,
+        connected = connected,
     )
 }

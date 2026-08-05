@@ -174,6 +174,24 @@ class WifiAnalyzerRepositoryTest {
         assertTrue(text.contains("WPA2 Personal"))
     }
 
+    @Test
+    fun savedNetworkShare_containsMetadataButNeverCredentials() {
+        val text = SavedWifiNetwork(
+            bssid = "aa:bb:cc:dd:ee:01",
+            ssid = "Test Wi-Fi",
+            hidden = false,
+            security = "WPA2 Personal",
+            band = WifiBand.BAND_2_4_GHZ,
+            channel = 1,
+            firstSavedMillis = 1,
+            lastSeenMillis = 2,
+        ).asPlainText()
+
+        assertTrue(text.contains("Name: Test Wi-Fi"))
+        assertTrue(text.contains("BSSID: aa:bb:cc:dd:ee:01"))
+        assertTrue(text.contains("Password: Not available to NetworkTools"))
+    }
+
     private fun observation(
         ssid: String? = "Test Wi-Fi",
         bssid: String? = "aa:bb:cc:dd:ee:01",

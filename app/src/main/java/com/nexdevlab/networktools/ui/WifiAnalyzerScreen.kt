@@ -34,6 +34,8 @@ import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Lan
+import androidx.compose.material.icons.outlined.QrCode2
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Share
@@ -93,6 +95,7 @@ import com.nexdevlab.networktools.data.WifiAnalyzerView
 import com.nexdevlab.networktools.data.WifiAnalyzerViewModel
 import com.nexdevlab.networktools.data.WifiBand
 import com.nexdevlab.networktools.data.WifiChannelScore
+import com.nexdevlab.networktools.data.WifiLanTarget
 import com.nexdevlab.networktools.data.WifiScanSnapshot
 import com.nexdevlab.networktools.ui.theme.ThemeChoice
 import java.text.DateFormat
@@ -106,6 +109,7 @@ fun WifiAnalyzerScreen(
     onBack: () -> Unit,
     themeChoice: ThemeChoice,
     onThemeChoice: (ThemeChoice) -> Unit,
+    onScanLan: (String) -> Unit = {},
     viewModel: WifiAnalyzerViewModel = viewModel(),
 ) {
     val state by viewModel.state.collectAsState()
@@ -115,6 +119,7 @@ fun WifiAnalyzerScreen(
     val scope = rememberCoroutineScope()
     var selectedView by rememberSaveable { mutableStateOf(WifiAnalyzerView.NETWORKS) }
     var showPermissionExplanation by rememberSaveable { mutableStateOf(false) }
+    var pendingSystemShareSsid by rememberSaveable { mutableStateOf<String?>(null) }
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
@@ -148,6 +153,33 @@ fun WifiAnalyzerScreen(
                 permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             },
             onDismiss = { showPermissionExplanation = false },
+        )
+    }
+
+    pendingSystemShareSsid?.let { ssid ->
+        val protectedDetails = if (ssid.isBlank()) {
+            "the device's complete saved-network list, passwords, and QR codes"
+        } else {
+            "the password and QR code for \"$ssid\""
+        }
+        AlertDialog(
+            onDismissRequest = { pendingSystemShareSsid = null },
+            icon = { Icon(Icons.Outlined.QrCode2, contentDescription = null) },
+            title = { Text("Open Android Wi-Fi sharing?") },
+            text = {
+                Text(
+                    "Android protects $protectedDetails. Continue to Wi-Fi settings, select the network, " +
+                        "then use Android's Share or QR control. Android may require your screen lock. " +
+                        "NetworkTools cannot see or store the password or QR code.",
+                )
+            },
+            confirmButton = {
+                Button(onClick = {
+                    pendingSystemShareSsid = null
+                    openSystemWifiSettings(context)
+                }) { Text("Open Wi-Fi settings") }
+            },
+            dismissButton = { TextButton(onClick = { pendingSystemShareSsid = null }) { Text("Cancel") } },
         )
     }
 
@@ -188,7 +220,8 @@ fun WifiAnalyzerScreen(
                         themeChoice = themeChoice,
                         onThemeChoice = onThemeChoice,
                         helpText = "Start a foreground scan to inspect nearby access points. Android may return cached " +
-                            "results when scans are throttled. Saved entries contain network identity only, never passwords.",
+                            "results when scans are throttled. Connected networks observed by NetworkTools are recorded " +
+                            "locally. Android Settings controls the complete saved-network list, passwords, and QR sharing.",
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
@@ -220,11 +253,15 @@ fun WifiAnalyzerScreen(
                     onScan = ::requestScan,
                     onToggleSaved = viewModel::toggleSaved,
                     onToggleComparison = viewModel::toggleComparison,
+                    onScanLan = onScanLan,
+                    onShareConnectedWifi = { pendingSystemShareSsid = it },
                 )
                 WifiAnalyzerView.CHANNELS -> wifiChannelsContent(state.snapshot, onScan = ::requestScan)
                 WifiAnalyzerView.SAVED -> wifiSavedContent(
                     saved = state.savedNetworks,
                     onRemove = viewModel::removeSaved,
+                    onOpenSystemShare = { pendingSystemShareSsid = it },
+                    onOpenSystemSavedNetworks = { pendingSystemShareSsid = "" },
                     onClear = viewModel::clearSaved,
                 )
             }
@@ -255,6 +292,8 @@ private fun androidx.compose.foundation.lazy.LazyListScope.wifiNetworksContent(
     onScan: () -> Unit,
     onToggleSaved: (WifiAccessPoint) -> Unit,
     onToggleComparison: (String) -> Unit,
+    onScanLan: (String) -> Unit,
+    onShareConnectedWifi: (String) -> Unit,
 ) {
     val snapshot = state.snapshot
     if (snapshot == null && !state.scanning) {
@@ -274,6 +313,9 @@ private fun androidx.compose.foundation.lazy.LazyListScope.wifiNetworksContent(
             comparisonEnabled = accessPoint.bssid in state.comparisonBssids || state.comparisonBssids.size < 2,
             onToggleSaved = { onToggleSaved(accessPoint) },
             onToggleComparison = { onToggleComparison(accessPoint.bssid) },
+            lanTarget = state.connectedLanTarget,
+            onScanLan = onScanLan,
+            onShareConnectedWifi = { onShareConnectedWifi(accessPoint.ssid) },
         )
     }
     if (snapshot.accessPoints.isEmpty() && !state.scanning) item { WifiNoResultsState(onScan) }
@@ -297,14 +339,20 @@ private fun androidx.compose.foundation.lazy.LazyListScope.wifiChannelsContent(
 private fun androidx.compose.foundation.lazy.LazyListScope.wifiSavedContent(
     saved: List<SavedWifiNetwork>,
     onRemove: (String) -> Unit,
+    onOpenSystemShare: (String) -> Unit,
+    onOpenSystemSavedNetworks: () -> Unit,
     onClear: () -> Unit,
 ) {
-    item { WifiSavedHeader(saved.isNotEmpty(), onClear) }
+    item { WifiSavedHeader(saved.isNotEmpty(), onOpenSystemSavedNetworks, onClear) }
     if (saved.isEmpty()) {
         item { WifiSavedEmpty() }
     } else {
         items(saved, key = SavedWifiNetwork::bssid) { network ->
-            WifiSavedRow(network, onRemove = { onRemove(network.bssid) })
+            WifiSavedRow(
+                network,
+                onOpenSystemShare = { onOpenSystemShare(network.ssid) },
+                onRemove = { onRemove(network.bssid) },
+            )
         }
     }
 }
@@ -411,6 +459,9 @@ private fun WifiAccessPointCard(
     comparisonEnabled: Boolean,
     onToggleSaved: () -> Unit,
     onToggleComparison: () -> Unit,
+    lanTarget: WifiLanTarget?,
+    onScanLan: (String) -> Unit,
+    onShareConnectedWifi: () -> Unit,
 ) {
     var expanded by rememberSaveable(accessPoint.bssid) { mutableStateOf(false) }
     Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surface) {
@@ -436,11 +487,15 @@ private fun WifiAccessPointCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                IconButton(onClick = onToggleSaved) {
-                    Icon(
-                        if (accessPoint.saved) Icons.Outlined.Star else Icons.Outlined.StarBorder,
-                        contentDescription = if (accessPoint.saved) "Remove saved network" else "Save network",
-                    )
+                IconButton(onClick = if (accessPoint.connected) onShareConnectedWifi else onToggleSaved) {
+                    if (accessPoint.connected) {
+                        Icon(Icons.Outlined.QrCode2, contentDescription = "Share connected Wi-Fi with Android QR code")
+                    } else {
+                        Icon(
+                            if (accessPoint.saved) Icons.Outlined.Star else Icons.Outlined.StarBorder,
+                            contentDescription = if (accessPoint.saved) "Remove saved network" else "Save network",
+                        )
+                    }
                 }
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
@@ -468,6 +523,15 @@ private fun WifiAccessPointCard(
                             enabled = comparisonEnabled,
                         )
                         Text("Compare this access point", style = MaterialTheme.typography.bodyMedium)
+                    }
+                    if (accessPoint.connected && lanTarget != null) {
+                        Button(
+                            onClick = { onScanLan(lanTarget.subnet) },
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        ) {
+                            Icon(Icons.Outlined.Lan, contentDescription = null)
+                            Text("Scan LAN (${lanTarget.localAddress})", modifier = Modifier.padding(start = 8.dp))
+                        }
                     }
                 }
             }
@@ -611,18 +675,22 @@ private fun WifiChannelScoreRow(score: WifiChannelScore, maximumScore: Double) {
 }
 
 @Composable
-private fun WifiSavedHeader(hasEntries: Boolean, onClear: () -> Unit) {
+private fun WifiSavedHeader(hasEntries: Boolean, onOpenSystemSavedNetworks: () -> Unit, onClear: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Button(onClick = onOpenSystemSavedNetworks, modifier = Modifier.fillMaxWidth()) {
+            Icon(Icons.Outlined.QrCode2, contentDescription = null)
+            Text("Open Android saved networks", modifier = Modifier.padding(start = 8.dp))
+        }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Outlined.Star, contentDescription = null, modifier = Modifier.size(21.dp))
-            Text("Saved in NetworkTools", style = MaterialTheme.typography.titleMedium,
+            Text("Observed in NetworkTools", style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 8.dp).weight(1f))
             TextButton(onClick = onClear, enabled = hasEntries) {
                 Icon(Icons.Outlined.ClearAll, contentDescription = null)
                 Text("Clear", modifier = Modifier.padding(start = 5.dp))
             }
         }
-        Text("Network identity only; Wi-Fi passwords are never accessed or stored.",
+        Text("Connected networks are recorded when scanned. Android Settings owns the complete saved list, passwords, and QR sharing.",
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
@@ -630,15 +698,16 @@ private fun WifiSavedHeader(hasEntries: Boolean, onClear: () -> Unit) {
 @Composable
 private fun WifiSavedEmpty() {
     Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surface) {
-        Text("Use the star beside an access point to save it here.", modifier = Modifier.padding(16.dp),
+        Text("Scan while connected to record a network here, or use a star to bookmark a visible network.", modifier = Modifier.padding(16.dp),
             color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
 @Composable
-private fun WifiSavedRow(network: SavedWifiNetwork, onRemove: () -> Unit) {
+private fun WifiSavedRow(network: SavedWifiNetwork, onOpenSystemShare: () -> Unit, onRemove: () -> Unit) {
     Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surface) {
-        Row(Modifier.fillMaxWidth().padding(start = 14.dp, top = 12.dp, bottom = 12.dp, end = 6.dp),
+        Row(Modifier.fillMaxWidth().clickable(onClick = onOpenSystemShare)
+            .padding(start = 14.dp, top = 12.dp, bottom = 12.dp, end = 6.dp),
             verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(network.ssid, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -647,6 +716,9 @@ private fun WifiSavedRow(network: SavedWifiNetwork, onRemove: () -> Unit) {
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text("Last seen ${DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(Date(network.lastSeenMillis))}",
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            IconButton(onClick = onOpenSystemShare) {
+                Icon(Icons.Outlined.QrCode2, contentDescription = "Open Android QR sharing for saved Wi-Fi network")
             }
             IconButton(onClick = onRemove) {
                 Icon(Icons.Outlined.DeleteOutline, contentDescription = "Remove saved Wi-Fi network")
@@ -695,4 +767,10 @@ private fun shareWifiScan(context: Context, snapshot: WifiScanSnapshot) {
         putExtra(Intent.EXTRA_TEXT, snapshot.asPlainText())
     }
     context.startActivity(Intent.createChooser(intent, "Share Wi-Fi scan"))
+}
+
+private fun openSystemWifiSettings(context: Context) {
+    val wifiSettings = Intent(Settings.ACTION_WIFI_SETTINGS)
+    runCatching { context.startActivity(wifiSettings) }
+        .onFailure { runCatching { context.startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) } }
 }

@@ -2,13 +2,13 @@
 
 ## Feature: How will it work?
 
-The active-test UI will use a stable semicircular meter with a numeric Mbps value, Download and Upload phase label, elapsed time, and accessible progress state. Its scale will expand by documented fixed steps without moving surrounding controls, and reduced-motion users will receive direct value updates without sweeping animation.
+The active-test UI uses a stable, large numeric Mbps value with Download and Upload phase labels, elapsed time, and an accessible progress state. Incoming values animate through a short easing window so rapid samples remain readable without causing surrounding controls to move. Completion uses a slightly longer settling animation; system animation-scale and reduced-motion behavior remain respected by Compose.
 
 ## Backend, Privacy, And Release Requirements
 
 - The planned provider is M-Lab NDT7 through [Locate API v2](https://www.measurementlab.net/develop/locate-v2/). M-Lab's [developer guidance](https://www.measurementlab.net/develop/) currently says NDT needs no developer API key, but NetworkTools must not ship a paid key, paid API, hardcoded server, token bypass, or unapproved public test endpoint.
-- M-Lab's current [Acceptable Use Policy](https://www.measurementlab.net/aup/) requires informed consent and a published privacy policy, limits interactive users to 40 tests per day, publishes measurement data including the client public IP, and may require commercial integrations to contribute or later register/pay. Release is blocked until NetworkTools has a live privacy-policy URL and the individual developer confirms written zero-cost eligibility for the intended monetization model.
-- Country requests must follow M-Lab's documented ISO country query and signed URLs. If strict country service is unavailable, show Unavailable; do not route to an undisclosed country, scrape server maps, or bypass Locate load balancing.
+- M-Lab's current [developer guidance](https://www.measurementlab.net/develop/) permits commercial and closed-source integrations without an API key. Its [Acceptable Use Policy](https://www.measurementlab.net/aup/) requires informed consent and a published privacy policy, limits interactive users to 40 tests per day, and publishes measurement data including the client public IP. Release remains blocked until NetworkTools has a live privacy-policy URL.
+- Country requests must follow M-Lab's documented ISO country query and signed URLs. Try `strict=true` first; when no in-country node exists, retry through Locate without strict mode and clearly identify the returned regional server's actual city and country. Never scrape server maps or bypass Locate load balancing.
 - Tests must be foreground, explicitly initiated, rate-limited, cancellable, synthetic-data only, and accurately disclosed under Google Play's [User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311) and [Device and Network Abuse policy](https://support.google.com/googleplay/android-developer/answer/16559646).
 - Before each release, recheck provider terms. If an API key, payment, commercial contribution, account contract, or incompatible data practice becomes mandatory, keep the feature disabled rather than silently changing providers.
 
@@ -21,7 +21,7 @@ The active-test UI will use a stable semicircular meter with a numeric Mbps valu
 
 ### 2. Functional Testing
 
-- [ ] Replay deterministic samples and verify the needle/value, scale transitions, phase label, elapsed time, and final state match the measurement model.
+- [ ] Replay deterministic samples and verify the animated value remains finite, tracks rapid increases/decreases smoothly, settles on the exact formatted final result, and never changes the measurement model's stored value.
 - [ ] Verify recomposition never starts network work, duplicates samples, changes elapsed time, or alters the final numeric result.
 
 ### 3. Compatibility Testing

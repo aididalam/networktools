@@ -17,6 +17,8 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.Inet4Address
 import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.Socket
 import java.nio.charset.StandardCharsets
 import java.util.Locale
 import kotlin.coroutines.resume
@@ -24,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.job
@@ -173,6 +176,22 @@ class LanScannerRepository(private val context: Context) {
                         record.hostname?.let { if (hostname.isNullOrBlank()) hostname = it }
                         record.macAddress?.let { if (macAddress.isNullOrBlank()) macAddress = it }
                         protocols += LanDiscoveryProtocol.NETBIOS
+                    }
+                }
+                publish()
+            }
+
+            onPhase("Checking common TCP ports")
+            devices.keys.toList().take(MaximumPortScanDevices).chunked(PortDeviceConcurrency).forEach { chunk ->
+                currentCoroutineContext().ensureActive()
+                val results = chunk.map { address -> async { address to scanCommonPorts(address) } }.awaitAll()
+                results.forEach { (address, ports) ->
+                    if (ports.isNotEmpty()) {
+                        devices[address]?.apply {
+                            openPorts.clear()
+                            openPorts += ports
+                            protocols += LanDiscoveryProtocol.TCP
+                        }
                     }
                 }
                 publish()
@@ -379,6 +398,32 @@ class LanScannerRepository(private val context: Context) {
         }
     }
 
+    private suspend fun scanCommonPorts(address: String): List<LanOpenPort> = coroutineScope {
+        val inetAddress = runCatching { InetAddress.getByName(address) }.getOrNull() ?: return@coroutineScope emptyList()
+        CommonLanPorts.map { port ->
+            async {
+                if (probeTcpPort(inetAddress, port)) {
+                    LanOpenPort(port, PortScannerRepository.serviceForPort(port))
+                } else null
+            }
+        }.awaitAll().filterNotNull().sortedBy(LanOpenPort::port)
+    }
+
+    private suspend fun probeTcpPort(address: InetAddress, port: Int): Boolean {
+        val socket = Socket()
+        val cancellation = currentCoroutineContext().job.invokeOnCompletion { runCatching { socket.close() } }
+        return try {
+            socket.connect(InetSocketAddress(address, port), PortProbeTimeoutMillis)
+            true
+        } catch (_: Exception) {
+            currentCoroutineContext().ensureActive()
+            false
+        } finally {
+            cancellation.dispose()
+            runCatching { socket.close() }
+        }
+    }
+
     private class DeviceAccumulator(val ipAddress: String) {
         var hostname: String? = null
         var macAddress: String? = null
@@ -386,18 +431,22 @@ class LanScannerRepository(private val context: Context) {
         var gateway = false
         val protocols = linkedSetOf<LanDiscoveryProtocol>()
         val services = linkedSetOf<String>()
+        val openPorts = mutableListOf<LanOpenPort>()
 
         fun toDevice(): LanDevice {
             val safeMac = macAddress?.lowercase(Locale.US)?.takeIf(MacPattern::matches)
             val manufacturer = safeMac?.let(::manufacturerForMac)
+            val safeOpenPorts = openPorts.distinctBy(LanOpenPort::port).sortedBy(LanOpenPort::port)
+            val identitySignals = services + safeOpenPorts.map { "${it.port} ${it.service}" }
             return LanDevice(
                 ipAddress = ipAddress,
                 hostname = sanitizeText(hostname),
                 macAddress = safeMac,
                 manufacturer = manufacturer,
-                deviceType = estimateDeviceType(thisDevice, gateway, hostname, manufacturer, services),
+                deviceType = estimateDeviceType(thisDevice, gateway, hostname, manufacturer, identitySignals.toSet()),
                 protocols = protocols.toSet(),
                 services = services.mapNotNull(::sanitizeText).take(MaximumServicesPerDevice).toSet(),
+                openPorts = safeOpenPorts,
                 thisDevice = thisDevice,
                 gateway = gateway,
                 lastSeenMillis = System.currentTimeMillis(),
@@ -409,7 +458,9 @@ class LanScannerRepository(private val context: Context) {
         private const val PingConcurrency = 20
         private const val HostnameConcurrency = 8
         private const val NetbiosConcurrency = 8
+        private const val PortDeviceConcurrency = 4
         private const val MaximumDeepDevices = 64
+        private const val MaximumPortScanDevices = 64
         private const val PingTimeoutMillis = 1_300L
         private const val MaximumPingOutputCharacters = 8_192
         private const val MaximumNeighborOutputCharacters = 128 * 1024
@@ -421,6 +472,7 @@ class LanScannerRepository(private val context: Context) {
         private const val DnsSdResolveTimeoutMillis = 900L
         private const val ReverseHostnameTimeoutMillis = 900L
         private const val NetbiosTimeoutMillis = 450
+        private const val PortProbeTimeoutMillis = 450
         private const val NetbiosPort = 137
         private const val NetbiosTransactionId = 0x4e54
         private const val MaximumNetbiosPacketBytes = 2_048
@@ -434,6 +486,10 @@ class LanScannerRepository(private val context: Context) {
             "_airplay._tcp.",
             "_ipp._tcp.",
             "_snmp._udp.",
+        )
+        private val CommonLanPorts = listOf(
+            21, 22, 23, 53, 80, 139, 443, 445, 515, 554, 631, 1883,
+            3000, 5000, 5900, 8000, 8080, 8443, 8883, 9000, 9090, 9100,
         )
         private val OuiManufacturers = mapOf(
             "001A11" to "Google",

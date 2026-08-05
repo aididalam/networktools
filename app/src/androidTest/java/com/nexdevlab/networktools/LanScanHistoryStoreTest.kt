@@ -6,6 +6,7 @@ import com.nexdevlab.networktools.data.LanDiscoveryProtocol
 import com.nexdevlab.networktools.data.LanScanHistoryStore
 import com.nexdevlab.networktools.data.LanScanMode
 import com.nexdevlab.networktools.data.LanScanResult
+import com.nexdevlab.networktools.data.LanOpenPort
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -37,6 +38,7 @@ class LanScanHistoryStoreTest {
         assertEquals(1, restored.devices.size)
         assertEquals("aa:bb:cc:dd:ee:01", restored.devices.single().macAddress)
         assertEquals(setOf(LanDiscoveryProtocol.ARP, LanDiscoveryProtocol.PING), restored.devices.single().protocols)
+        assertEquals(listOf(LanOpenPort(80, "HTTP")), restored.devices.single().openPorts)
     }
 
     @Test
@@ -58,6 +60,7 @@ class LanScanHistoryStoreTest {
                 macAddress = "aa:bb:cc:dd:ee:01",
                 deviceType = "Router / gateway",
                 protocols = setOf(LanDiscoveryProtocol.ARP, LanDiscoveryProtocol.PING),
+                openPorts = listOf(LanOpenPort(80, "HTTP")),
                 gateway = true,
                 lastSeenMillis = id,
             ),

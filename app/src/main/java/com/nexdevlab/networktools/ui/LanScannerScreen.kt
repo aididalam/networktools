@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.ClearAll
 import androidx.compose.material.icons.outlined.Computer
 import androidx.compose.material.icons.outlined.ContentCopy
@@ -107,6 +108,7 @@ fun LanScannerScreen(
     onBack: () -> Unit,
     themeChoice: ThemeChoice,
     onThemeChoice: (ThemeChoice) -> Unit,
+    initialSubnet: String? = null,
     viewModel: LanScannerViewModel = viewModel(),
 ) {
     val state by viewModel.state.collectAsState()
@@ -115,9 +117,11 @@ fun LanScannerScreen(
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var selectedView by rememberSaveable { mutableStateOf(LanScannerView.SCANNER) }
-    var subnetText by rememberSaveable { mutableStateOf("") }
-    var subnetEdited by rememberSaveable { mutableStateOf(false) }
-    var mode by rememberSaveable { mutableStateOf(LanScanMode.FAST) }
+    var subnetText by rememberSaveable(initialSubnet) { mutableStateOf(initialSubnet.orEmpty()) }
+    var subnetEdited by rememberSaveable(initialSubnet) { mutableStateOf(!initialSubnet.isNullOrBlank()) }
+    var mode by rememberSaveable(initialSubnet) {
+        mutableStateOf(if (initialSubnet.isNullOrBlank()) LanScanMode.FAST else LanScanMode.DEEP)
+    }
     var authorized by rememberSaveable { mutableStateOf(false) }
     var validationError by rememberSaveable { mutableStateOf<String?>(null) }
     var pendingConfig by remember { mutableStateOf<LanScanConfig?>(null) }
@@ -222,7 +226,8 @@ fun LanScannerScreen(
                         themeChoice = themeChoice,
                         onThemeChoice = onThemeChoice,
                         helpText = "Scan only a private LAN that you own or are authorized to test. " +
-                            "Fast mode checks reachability and neighbors; Deep mode also listens for local service advertisements.",
+                            "Fast mode checks reachability and neighbors. Deep mode also discovers advertised services, " +
+                            "device identity, and common open TCP ports. Service names are estimates based on port numbers.",
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
@@ -477,6 +482,7 @@ private fun LanEmptyState() {
 
 @Composable
 private fun LanDeviceCard(device: LanDevice) {
+    val context = LocalContext.current
     var expanded by rememberSaveable(device.ipAddress) { mutableStateOf(false) }
     Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surface) {
         Column {
@@ -516,6 +522,34 @@ private fun LanDeviceCard(device: LanDevice) {
                     LanDetailRow("Device type", device.deviceType)
                     LanDetailRow("Discovered by", device.protocols.joinToString { it.label }.ifBlank { "Active link" })
                     if (device.services.isNotEmpty()) LanDetailRow("Services", device.services.joinToString())
+                    if (device.openPorts.isNotEmpty()) {
+                        Text(
+                            "Open TCP ports",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
+                        )
+                        device.openPorts.forEach { openPort ->
+                            Row(
+                                Modifier.fillMaxWidth().height(44.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Column(Modifier.weight(1f)) {
+                                    Text("${openPort.port}/tcp", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Medium)
+                                    Text(
+                                        "Likely ${openPort.service}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                                openPort.webUrl(device.ipAddress)?.let { url ->
+                                    IconButton(onClick = { openLanWebService(context, url) }) {
+                                        Icon(Icons.AutoMirrored.Outlined.OpenInNew,
+                                            contentDescription = "Open ${openPort.service} service")
+                                    }
+                                }
+                            }
+                        }
+                    }
                     LanDetailRow("Last seen", DateFormat.getTimeInstance(DateFormat.MEDIUM).format(Date(device.lastSeenMillis)))
                 }
             }
@@ -574,6 +608,14 @@ private fun deviceIcon(device: LanDevice): ImageVector = when {
 
 private fun openLanSettings(context: Context) {
     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}"))
+    runCatching { context.startActivity(intent) }
+}
+
+private fun openLanWebService(context: Context, url: String) {
+    val uri = runCatching { Uri.parse(url) }.getOrNull() ?: return
+    val address = uri.host?.let(LanSubnet::parseIpv4)?.takeIf(LanSubnet::isPrivate) ?: return
+    if (LanSubnet.formatIpv4(address) != uri.host || uri.scheme !in setOf("http", "https")) return
+    val intent = Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE)
     runCatching { context.startActivity(intent) }
 }
 

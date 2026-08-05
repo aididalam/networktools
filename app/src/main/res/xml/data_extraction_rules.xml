@@ -12,6 +12,8 @@
         <exclude domain="sharedpref" path="port_scan_history.xml" />
         <exclude domain="sharedpref" path="wake_on_lan_devices.xml" />
         <exclude domain="sharedpref" path="connections_log.xml" />
+        <exclude domain="sharedpref" path="speed_test_history.xml" />
+        <exclude domain="sharedpref" path="speed_test_policy.xml" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="sharedpref" path="ping_history.xml" />
@@ -21,5 +23,7 @@
         <exclude domain="sharedpref" path="port_scan_history.xml" />
         <exclude domain="sharedpref" path="wake_on_lan_devices.xml" />
         <exclude domain="sharedpref" path="connections_log.xml" />
+        <exclude domain="sharedpref" path="speed_test_history.xml" />
+        <exclude domain="sharedpref" path="speed_test_policy.xml" />
     </device-transfer>
 </data-extraction-rules>

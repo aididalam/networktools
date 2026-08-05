@@ -14,6 +14,31 @@ enum class LanDiscoveryProtocol(val label: String) {
     UPNP("UPnP"),
     SNMP("SNMP service"),
     NETBIOS("NetBIOS"),
+    TCP("TCP ports"),
+}
+
+data class LanOpenPort(
+    val port: Int,
+    val service: String,
+) {
+    init {
+        require(port in 1..65535) { "Port must be from 1-65535" }
+    }
+
+    fun webUrl(ipAddress: String): String? {
+        val address = LanSubnet.parseIpv4(ipAddress)?.takeIf(LanSubnet::isPrivate) ?: return null
+        val normalizedAddress = LanSubnet.formatIpv4(address)
+        val scheme = when (port) {
+            443, 8443 -> "https"
+            80, 3000, 5000, 8000, 8080, 9000, 9090 -> "http"
+            else -> return null
+        }
+        val authority = when (port) {
+            80, 443 -> normalizedAddress
+            else -> "$normalizedAddress:$port"
+        }
+        return "$scheme://$authority/"
+    }
 }
 
 data class LanSubnet(val network: Long, val prefixLength: Int) {
@@ -101,6 +126,7 @@ data class LanDevice(
     val deviceType: String = "Unknown device",
     val protocols: Set<LanDiscoveryProtocol> = emptySet(),
     val services: Set<String> = emptySet(),
+    val openPorts: List<LanOpenPort> = emptyList(),
     val thisDevice: Boolean = false,
     val gateway: Boolean = false,
     val lastSeenMillis: Long,
@@ -139,6 +165,10 @@ data class LanScanResult(
                 add("  Found by: ${device.protocols.joinToString { it.label }}")
             }
             if (device.services.isNotEmpty()) add("  Services: ${device.services.joinToString()}")
+            if (device.openPorts.isNotEmpty()) {
+                add("  Open TCP ports (service estimated by port): " +
+                    device.openPorts.joinToString { "${it.port} ${it.service}" })
+            }
         }
     }.joinToString("\n")
 }

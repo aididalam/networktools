@@ -29,7 +29,7 @@ class SpeedTestHistoryStore(context: Context) {
     fun clear(): List<SpeedTestResult> = save(emptyList())
 
     private fun save(entries: List<SpeedTestResult>): List<SpeedTestResult> {
-        val safe = entries.map(SpeedTestResult::sanitized).take(MaximumEntries)
+        val safe = entries.map { it.sanitized() }.take(MaximumEntries)
         val json = JSONArray()
         safe.forEach { result ->
             json.put(JSONObject().apply {

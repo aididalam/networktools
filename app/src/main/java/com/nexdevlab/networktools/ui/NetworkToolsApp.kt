@@ -71,6 +71,8 @@ fun NetworkToolsApp() {
         context.getSharedPreferences(PreferencesName, Context.MODE_PRIVATE)
     }
     var route by rememberSaveable { mutableStateOf("home") }
+    var lanScannerInitialSubnet by rememberSaveable { mutableStateOf<String?>(null) }
+    var lanScannerReturnRoute by rememberSaveable { mutableStateOf<String?>(null) }
     var themeChoice by rememberSaveable {
         mutableStateOf(
             preferences.getString(ThemeKey, null)
@@ -84,7 +86,16 @@ fun NetworkToolsApp() {
             themeChoice = it
             preferences.edit().putString(ThemeKey, it.name).apply()
         }
-        BackHandler(enabled = route != "home") { route = "home" }
+        val navigateBack: () -> Unit = {
+            if (route == "lan-scanner" && lanScannerReturnRoute != null) {
+                route = lanScannerReturnRoute ?: "home"
+                lanScannerReturnRoute = null
+                lanScannerInitialSubnet = null
+            } else {
+                route = "home"
+            }
+        }
+        BackHandler(enabled = route != "home", onBack = navigateBack)
         key(route) {
             when (route) {
                 "ip-information" -> IpInformationScreen(
@@ -111,11 +122,17 @@ fun NetworkToolsApp() {
                     onBack = { route = "home" },
                     themeChoice = themeChoice,
                     onThemeChoice = updateThemeChoice,
+                    onScanLan = { subnet ->
+                        lanScannerInitialSubnet = subnet
+                        lanScannerReturnRoute = "wifi-analyzer"
+                        route = "lan-scanner"
+                    },
                 )
                 "lan-scanner" -> LanScannerScreen(
-                    onBack = { route = "home" },
+                    onBack = navigateBack,
                     themeChoice = themeChoice,
                     onThemeChoice = updateThemeChoice,
+                    initialSubnet = lanScannerInitialSubnet,
                 )
                 "port-scanner" -> PortScannerScreen(
                     onBack = { route = "home" },
@@ -157,10 +174,21 @@ fun NetworkToolsApp() {
                     themeChoice = themeChoice,
                     onThemeChoice = updateThemeChoice,
                 )
+                "internet-speed-meter" -> InternetSpeedMeterScreen(
+                    onBack = { route = "home" },
+                    themeChoice = themeChoice,
+                    onThemeChoice = updateThemeChoice,
+                )
                 else -> HomeScreen(
                     themeChoice = themeChoice,
                     onThemeChoice = updateThemeChoice,
-                    onOpenTool = { route = it },
+                    onOpenTool = { destination ->
+                        if (destination == "lan-scanner") {
+                            lanScannerInitialSubnet = null
+                            lanScannerReturnRoute = null
+                        }
+                        route = destination
+                    },
                 )
             }
         }
